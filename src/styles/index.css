@@ -203,8 +203,46 @@
 }
 
 /* ---------------------------------------------------------------------------
+   SIGNAL LINE — Loading Experience narrative motif.
+   Thin horizontal line appearing from darkness, with a subtle pulse.
+   CSS-driven, GPU-friendly (transform/opacity). Not a progress indicator.
+--------------------------------------------------------------------------- */
+
+.signal-line {
+  display: block;
+  width: 6.5rem;
+  height: 1px;
+  background-color: var(--color-accent);
+  transform-origin: left center;
+  opacity: 0;
+  animation: signal-appear 1.2s ease-out 0.4s forwards,
+    signal-pulse 5s ease-in-out 1.6s infinite;
+}
+
+@keyframes signal-appear {
+  from {
+    opacity: 0;
+    transform: scaleX(0.25);
+  }
+  to {
+    opacity: 0.45;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes signal-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.22;
+  }
+}
+
+/* ---------------------------------------------------------------------------
    REDUCED MOTION
-   Collapse atmosphere effects so the foundation stays fully usable.
+   Collapse atmosphere + signal effects so the foundation stays usable.
 --------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
@@ -217,5 +255,11 @@
   .vignette,
   .ambient-light {
     opacity: 0 !important;
+  }
+
+  .signal-line {
+    /* Static signal: appears once, no continuous pulse. */
+    animation: none;
+    opacity: 0.45;
   }
 }
