@@ -1,11 +1,34 @@
-// Placeholder hook.
-//
-// Future role: report a normalized scroll progress (0..1) for the current
-// section so cinematic GSAP timelines can drive content from it.
-// Intentionally un-implemented until ScrollTrigger wiring is designed.
-//
-// Returns a stable 0 progress value so callers can mount safely today.
+import { useState } from 'react'
+import { useGSAP } from '@gsap/react'
+import { ScrollTrigger } from '../animations/setup'
 
-export function useSectionProgress() {
-  return 0
+// Reports a normalized scroll progress (0 → beginning, 1 → ending) for the
+// given section ref. Scoped per-call: owns its own ScrollTrigger, no global
+// listeners, cleanup-safe for React StrictMode.
+//
+// API: const progress = useSectionProgress(ref)
+// Returns a stable 0 (resting/gated) value until a section element exists.
+export function useSectionProgress(ref) {
+  const [progress, setProgress] = useState(0)
+
+  useGSAP(
+    () => {
+      const el = typeof ref === 'function' ? ref() : ref?.current
+      if (!el) return
+
+      const trigger = ScrollTrigger.create({
+        trigger: el,
+        start: 'top bottom',
+        end: 'bottom top',
+        onUpdate: (self) => {
+          setProgress(self.progress)
+        },
+      })
+
+      return () => trigger.kill()
+    },
+    { dependencies: [ref] },
+  )
+
+  return progress
 }

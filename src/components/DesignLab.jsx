@@ -57,11 +57,6 @@ function SectionLabel({ children }) {
 export default function DesignLab() {
   return (
     <>
-      {/* Atmosphere layers applied globally so the lab shows the real world. */}
-      <div className="ambient-light" aria-hidden="true" />
-      <div className="vignette" aria-hidden="true" />
-      <div className="grain-overlay" aria-hidden="true" />
-
       <section className="section-full">
         <div className="w-cinematic px-6 py-24">
           <p className="font-metadata mb-4 text-xs uppercase tracking-[0.3em] text-accent">
@@ -182,10 +177,10 @@ export default function DesignLab() {
           <section aria-label="Atmosphere layers">
             <SectionLabel>Atmosphere — layer model</SectionLabel>
             <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-2">
-              <AtmosphereCard label="Layer 0 · background / ambient" className="bg-bg" note="semantic background + fixed ambient-light (live on this page)" />
+              <AtmosphereCard label="Layer 0 · background / ambient" className="bg-bg" note="semantic background; ambient-light mounted globally in App" />
               <AtmosphereCard label="Layer 10 · content" className="bg-surface" note="future sections render here" />
-              <AtmosphereCard label="Layer 20 · vignette" className="bg-bg" note="radial darkening at edges (live on this page)" />
-              <AtmosphereCard label="Layer 30 · grain" className="bg-bg" note="static overlay, pointer-events none (texture pending)" />
+              <AtmosphereCard label="Layer 20 · vignette" className="bg-bg" note="radial darkening at edges; mounted globally in App" />
+              <AtmosphereCard label="Layer 30 · grain" className="bg-bg" note="static overlay, pointer-events none; mounted globally in App (texture pending)" />
             </div>
           </section>
 
