@@ -1,31 +1,12 @@
-import { useEffect } from 'react'
-import gsap from 'gsap'
-import Lenis from 'lenis'
 import { motion } from 'motion/react'
-import { Heart } from 'lucide-react'
+import { useReducedMotion } from './hooks/useReducedMotion'
 
 function App() {
-  useEffect(() => {
-    const lenis = new Lenis()
-    const raf = (time) => lenis.raf(time)
-    gsap.ticker.add(raf)
-    gsap.ticker.lagSmoothing(0)
-
-    return () => {
-      gsap.ticker.remove(raf)
-      lenis.destroy()
-    }
-  }, [])
+  useReducedMotion()
 
   return (
     <main className="min-h-svh">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Heart aria-hidden="true" />
-      </motion.div>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} aria-hidden="true" />
     </main>
   )
 }

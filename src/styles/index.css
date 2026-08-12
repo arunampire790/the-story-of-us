@@ -10,3 +10,10 @@
     -moz-osx-font-smoothing: grayscale;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body {
+    scroll-behavior: auto !important;
+  }
+}
