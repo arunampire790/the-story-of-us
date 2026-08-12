@@ -67,7 +67,7 @@ export default function Beat01TheRoom({ data }) {
 
       <h1
         data-beat01="title"
-        className="mt-6 font-display text-5xl font-medium leading-none text-text sm:text-7xl"
+        className="mt-6 font-display text-4xl font-medium leading-none text-text sm:text-6xl"
       >
         {data.title}
       </h1>
@@ -80,7 +80,7 @@ export default function Beat01TheRoom({ data }) {
         data-beat01="memory"
         className="mt-12 max-w-2xl font-quote text-2xl font-light leading-relaxed text-text sm:text-4xl"
       >
-        “{data.roomDescription}”
+        {data.roomDescription}
       </blockquote>
     </section>
   )
