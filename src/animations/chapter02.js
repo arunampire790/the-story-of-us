@@ -1,296 +1,180 @@
 import gsap, { ScrollTrigger } from './setup'
 
 // Chapter 02 — The Voice Room. GSAP timeline factories.
-// Story-agnostic: these functions receive a scope/ref and orchestrate
-// animation ONLY. They must never import story data.
 //
-// Visual direction (text → voice; continuous with Chapter 01):
-//   Beat 01 — The Voice Room: the ring emblem reopens as the room where the
-//     typed signal becomes a voice (the motif continues from Chapter 01).
-//   Beat 02 — The Signal: the HelloTalk connection is fragile ("often weak"),
-//     shown as the motif wrapper dimming/flickering on scroll.
-//   Beat 03 — In the Voice: restrained language fragments — gentle breathing.
-//   Beat 04 — Continuing: quiet record lines; the motif steadies, then dims
-//     on exit as a breathing-space handoff for the next chapter.
-//
-// Animation ownership: GSAP never touches the CSS-owned opacity/scale pulse
-// on the ring circles — it only transforms the VoiceMotif WRAPPER. Pattern
-// and scroll-window discipline match animations/chapter01.js (sequential
-// windows, no property fights, no pin).
+// One chapter-scoped master controls ONLY the environment (presence distance,
+// color, focus, room glow, connecting thread). Beat-level timelines control
+// ONLY narrative text / spectral fragments / local foreground transforms.
+// Distinct targets → no property fights. No pin, no wheel/touch handlers, no
+// scrollerProxy, no custom RAF. Reduced motion skips the scrubbed master and
+// collapses content reveals to instant/fade-only.
 
-export function createVoiceRoomEntranceTimeline(scope, { reduced = false } = {}) {
-  const timeline = gsap.timeline({
-    defaults: { ease: 'power2.out' },
-    scope,
-    paused: true,
-    delay: reduced ? 0 : 0.2,
-  })
+export function createPresenceMasterTimeline(scope, { reduced = false } = {}) {
+  const timeline = gsap.timeline({ defaults: { ease: 'none' }, scope, paused: true })
 
+  // A → B  | arrival → fragile signal: presence dims, recedes (cool visible)
+  timeline
+    .to('[data-presence="presence"]', { y: -8, opacity: 0.3, duration: 0.18 }, 0)
+    .to('[data-presence="glow"]', { opacity: 0.16, duration: 0.18 }, 0)
+    .to('[data-presence="atmo"]', { opacity: 0.08, duration: 0.18 }, 0)
+    .to('[data-presence="thread"]', { opacity: 0.1, duration: 0.18 }, 0)
+
+  // B → C  | signal → voice (warmth peak): presence returns near, crossfade
+  //          cool→warm layers (opacity only), room glow + atmosphere rise
+  timeline
+    .to('[data-presence="presence"]', { y: 48, opacity: 0.95, duration: 0.37 })
+    .to('[data-presence="cool"]', { opacity: 0, duration: 0.37 })
+    .to('[data-presence="warm"]', { opacity: 1, duration: 0.37 })
+    .to('[data-presence="glow"]', { opacity: 0.6, duration: 0.37 })
+    .to('[data-presence="atmo"]', { opacity: 0.22, duration: 0.37 })
+    .to('[data-presence="thread"]', { opacity: 0.5, duration: 0.37 })
+
+  // C → D  | voice → continuing: presence settles, thread steady
+  timeline
+    .to('[data-presence="presence"]', { y: 52, opacity: 0.9, duration: 0.27 })
+    .to('[data-presence="thread"]', { opacity: 0.85, duration: 0.27 })
+    .to('[data-presence="glow"]', { opacity: 0.48, duration: 0.27 })
+    .to('[data-presence="atmo"]', { opacity: 0.18, duration: 0.27 })
+
+  // D → E  | continuing → rest: dimmed breathing core
+  timeline
+    .to('[data-presence="presence"]', { y: 42, opacity: 0.72, duration: 0.18 })
+    .to('[data-presence="glow"]', { opacity: 0.4, duration: 0.18 })
+    .to('[data-presence="atmo"]', { opacity: 0.15, duration: 0.18 })
+    .to('[data-presence="thread"]', { opacity: 0.5, duration: 0.18 })
+
+  if (!reduced) {
+    ScrollTrigger.create({
+      trigger: scope,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: 1,
+      animation: timeline,
+    })
+  } else {
+    // Reduced motion: static settled room (no scrubbed environment animation).
+    timeline.progress(1).pause()
+  }
+
+  return timeline
+}
+
+// Content reveals (per beat). Play once on scroll into view. Reduced motion
+// collapses to an instant/no-op reveal.
+
+export function createArrivalEntrance(scope, { reduced = false } = {}) {
+  const timeline = gsap.timeline({ defaults: { ease: 'power2.out' }, scope, paused: true })
   timeline
     .fromTo(
-      '[data-ch02room="metadata"]',
-      { opacity: 0, y: 12 },
+      '[data-arrival="kicker"]',
+      { opacity: 0, y: 10 },
       { opacity: 1, y: 0, duration: reduced ? 0 : 0.6 },
       0,
     )
     .fromTo(
-      '[data-ch02room="title"]',
-      { opacity: 0, y: 16 },
-      { opacity: 1, y: 0, duration: reduced ? 0 : 0.7 },
-      reduced ? 0 : 0.35,
-    )
-    .fromTo(
-      '[data-ch02room="intro"]',
-      { opacity: 0, y: 14 },
-      { opacity: 1, y: 0, duration: reduced ? 0 : 0.7 },
-      reduced ? 0 : 0.6,
-    )
-    .fromTo(
-      '[data-ch02room="motif"]',
-      { opacity: 0, scale: 0.85 },
-      { opacity: 1, scale: 1, duration: reduced ? 0 : 0.7 },
-      reduced ? 0 : 0.9,
-    )
-
-  ScrollTrigger.create({
-    trigger: scope,
-    start: 'top 80%',
-    toggleActions: 'play none none none',
-    once: true,
-    animation: timeline,
-  })
-
-  return timeline
-}
-
-// Beat 01 — gentle scrubbed "breathing" while in view (matches Chapter 01 cadence).
-// Ring circles' own pulse stays CSS-owned; only the wrapper scale is animated.
-export function createVoiceRoomScrollChoreography(scope, { reduced = false } = {}) {
-  const timeline = gsap.timeline({ defaults: { ease: 'none' }, scope })
-
-  timeline
-    .fromTo('[data-ch02room="metadata"]', { y: 0 }, { y: -6, duration: 1 }, 0)
-    .fromTo('[data-ch02room="title"]', { y: 0 }, { y: -10, duration: 1 }, 0)
-    .fromTo('[data-ch02room="intro"]', { y: 0 }, { y: -14, duration: 1 }, 0)
-    .fromTo('[data-ch02room="motif"]', { scale: 0.985 }, { scale: 1.02, duration: 1 }, 0)
-
-  if (!reduced) {
-    ScrollTrigger.create({
-      trigger: scope,
-      start: 'top 60%',
-      end: 'top -20%',
-      scrub: 0.6,
-      animation: timeline,
-    })
-  }
-
-  return timeline
-}
-
-// Beat 02 — entrance (once).
-export function createSignalEntranceTimeline(scope, { reduced = false } = {}) {
-  const timeline = gsap.timeline({
-    defaults: { ease: 'power2.out' },
-    scope,
-    paused: true,
-  })
-
-  timeline
-    .fromTo(
-      '[data-ch02signal="heading"]',
-      { opacity: 0, y: 14 },
-      { opacity: 1, y: 0, duration: reduced ? 0 : 0.7 },
-      0,
-    )
-    .fromTo(
-      '[data-ch02signal="body"]',
+      '[data-arrival="title"]',
       { opacity: 0, y: 14 },
       { opacity: 1, y: 0, duration: reduced ? 0 : 0.7 },
       reduced ? 0 : 0.25,
     )
     .fromTo(
-      '[data-ch02signal="motif"]',
-      { opacity: 0, scale: 0.9 },
-      { opacity: 1, scale: 1, duration: reduced ? 0 : 0.7 },
+      '[data-arrival="record"]',
+      { opacity: 0, y: 10 },
+      { opacity: 1, y: 0, duration: reduced ? 0 : 0.6 },
       reduced ? 0 : 0.5,
     )
-
-  ScrollTrigger.create({
-    trigger: scope,
-    start: 'top 75%',
-    toggleActions: 'play none none none',
-    once: true,
-    animation: timeline,
-  })
-
-  return timeline
-}
-
-// Beat 02 — fragility: the motif dims and recovers as the connection proves
-// unsteady ("often weak"). Wrapper opacity only; CSS-owned pulse untouched.
-export function createSignalFragilityChoreography(scope, { reduced = false } = {}) {
-  const timeline = gsap.timeline({ defaults: { ease: 'none' }, scope })
-
-  timeline
-    .fromTo('[data-ch02signal="content"]', { y: 0 }, { y: -16, duration: 1 }, 0)
-    .fromTo('[data-ch02signal="motif"]', { opacity: 1 }, { opacity: 0.35, duration: 1 }, 0)
-    .to('[data-ch02signal="motif"]', { opacity: 0.85, duration: 0.4 })
-
-  if (!reduced) {
-    ScrollTrigger.create({
-      trigger: scope,
-      start: 'top 60%',
-      end: 'top -20%',
-      scrub: 0.6,
-      animation: timeline,
-    })
-  }
-
-  return timeline
-}
-
-// Beat 03 — entrance (once), fragments stagger in.
-export function createVoiceIntimacyEntrance(scope, { reduced = false } = {}) {
-  const timeline = gsap.timeline({
-    defaults: { ease: 'power2.out' },
-    scope,
-    paused: true,
-  })
-
-  timeline
     .fromTo(
-      '[data-ch02voice="heading"]',
-      { opacity: 0, y: 14 },
-      { opacity: 1, y: 0, duration: reduced ? 0 : 0.7 },
-      0,
-    )
-    .fromTo(
-      '[data-ch02voice="fragment"]',
-      { opacity: 0, y: 10 },
-      { opacity: 1, y: 0, duration: reduced ? 0 : 0.5, stagger: reduced ? 0 : 0.12 },
-      reduced ? 0 : 0.25,
-    )
-    .fromTo(
-      '[data-ch02voice="motif"]',
-      { opacity: 0, scale: 0.9 },
-      { opacity: 1, scale: 1, duration: reduced ? 0 : 0.7 },
+      '[data-arrival="aperture"]',
+      { opacity: 0, scale: 0.86 },
+      { opacity: 1, scale: 1, duration: reduced ? 0 : 0.8 },
       reduced ? 0 : 0.6,
     )
-
   ScrollTrigger.create({
     trigger: scope,
-    start: 'top 75%',
+    start: 'top 70%',
     toggleActions: 'play none none none',
     once: true,
     animation: timeline,
   })
-
   return timeline
 }
 
-// Beat 03 — gentle "voice" breathing: slow wrapper scale on the motif.
-export function createVoiceIntimacyChoreography(scope, { reduced = false } = {}) {
-  const timeline = gsap.timeline({ defaults: { ease: 'none' }, scope })
-
-  timeline
-    .fromTo('[data-ch02voice="content"]', { y: 0 }, { y: -18, duration: 1 }, 0)
-    .fromTo('[data-ch02voice="motif"]', { scale: 1 }, { scale: 1.035, duration: 1 }, 0)
-
-  if (!reduced) {
-    ScrollTrigger.create({
-      trigger: scope,
-      start: 'top 60%',
-      end: 'top -20%',
-      scrub: 0.6,
-      animation: timeline,
-    })
-  }
-
-  return timeline
-}
-
-// Beat 04 — entrance (once).
-export function createContinuingEntranceTimeline(scope, { reduced = false } = {}) {
-  const timeline = gsap.timeline({
-    defaults: { ease: 'power2.out' },
-    scope,
-    paused: true,
-  })
-
+export function createSignalEntrance(scope, { reduced = false } = {}) {
+  const timeline = gsap.timeline({ defaults: { ease: 'power2.out' }, scope, paused: true })
   timeline
     .fromTo(
-      '[data-ch02continuing="heading"]',
+      '[data-signal="heading"]',
       { opacity: 0, y: 14 },
       { opacity: 1, y: 0, duration: reduced ? 0 : 0.7 },
       0,
     )
     .fromTo(
-      '[data-ch02continuing="record"]',
+      '[data-signal="record"]',
       { opacity: 0, y: 10 },
-      { opacity: 1, y: 0, duration: reduced ? 0 : 0.55, stagger: reduced ? 0 : 0.15 },
+      { opacity: 1, y: 0, duration: reduced ? 0 : 0.6 },
       reduced ? 0 : 0.25,
     )
-    .fromTo(
-      '[data-ch02continuing="motif"]',
-      { opacity: 0, scale: 0.92 },
-      { opacity: 1, scale: 1, duration: reduced ? 0 : 0.7 },
-      reduced ? 0 : 0.5,
-    )
-
   ScrollTrigger.create({
     trigger: scope,
-    start: 'top 75%',
+    start: 'top 70%',
     toggleActions: 'play none none none',
     once: true,
     animation: timeline,
   })
-
   return timeline
 }
 
-// Beat 04 — gentle parallax while in view.
-export function createContinuingChoreography(scope, { reduced = false } = {}) {
-  const timeline = gsap.timeline({ defaults: { ease: 'none' }, scope })
-
-  timeline.fromTo('[data-ch02continuing="content"]', { y: 0 }, { y: -16, duration: 1 }, 0)
-
-  if (!reduced) {
-    ScrollTrigger.create({
-      trigger: scope,
-      start: 'top 60%',
-      end: 'top -20%',
-      scrub: 0.6,
-      animation: timeline,
-    })
-  }
-
-  return timeline
-}
-
-// Chapter exit / breathing-space handoff: as Beat 04 leaves, the motif dims
-// and recedes small — a quiet resting state for the next chapter, before the
-// daily-call period / confession. Wrapper transform/opacity only.
-export function createChapter02Exit(scope, { reduced = false } = {}) {
-  const timeline = gsap.timeline({ defaults: { ease: 'none' }, scope })
-
+export function createVoiceEntrance(scope, { reduced = false } = {}) {
+  const timeline = gsap.timeline({ defaults: { ease: 'power2.out' }, scope, paused: true })
   timeline
-    .fromTo('[data-ch02continuing="content"]', { opacity: 1 }, { opacity: 0, duration: 0.4 }, 0)
     .fromTo(
-      '[data-ch02continuing="motif"]',
-      { opacity: 1, y: 0, scale: 1 },
-      { opacity: 0.45, y: -48, scale: 0.9, duration: 0.5 },
-      0.2,
+      '[data-voice="heading"]',
+      { opacity: 0, y: 10 },
+      { opacity: 1, y: 0, duration: reduced ? 0 : 0.6 },
+      0,
     )
+    .fromTo(
+      '[data-voice="fragment"]',
+      { opacity: 0, y: 12 },
+      { opacity: 0.85, y: 0, duration: reduced ? 0 : 0.8, stagger: reduced ? 0 : 0.18 },
+      reduced ? 0 : 0.2,
+    )
+    .to(
+      '[data-voice="light"]',
+      { opacity: 0.9, duration: reduced ? 0 : 0.6 },
+      reduced ? 0 : 1.1,
+    )
+  ScrollTrigger.create({
+    trigger: scope,
+    start: 'top 65%',
+    toggleActions: 'play none none none',
+    once: true,
+    animation: timeline,
+  })
+  return timeline
+}
 
-  if (!reduced) {
-    ScrollTrigger.create({
-      trigger: scope,
-      start: 'top -20%',
-      end: 'top -100%',
-      scrub: 0.7,
-      animation: timeline,
-    })
-  }
-
+export function createContinuingEntrance(scope, { reduced = false } = {}) {
+  const timeline = gsap.timeline({ defaults: { ease: 'power2.out' }, scope, paused: true })
+  timeline
+    .fromTo(
+      '[data-continuing="heading"]',
+      { opacity: 0, y: 14 },
+      { opacity: 1, y: 0, duration: reduced ? 0 : 0.7 },
+      0,
+    )
+    .fromTo(
+      '[data-continuing="record"]',
+      { opacity: 0, y: 10 },
+      { opacity: 1, y: 0, duration: reduced ? 0 : 0.6 },
+      reduced ? 0 : 0.25,
+    )
+  ScrollTrigger.create({
+    trigger: scope,
+    start: 'top 70%',
+    toggleActions: 'play none none none',
+    once: true,
+    animation: timeline,
+  })
   return timeline
 }

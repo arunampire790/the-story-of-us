@@ -26,9 +26,8 @@ export const chapter02Data = {
       title: 'The Voice Room',
       platform: 'HelloTalk',
       roomLabel: 'Voice Room',
-      // Minimal connector lines (approved-copy category) expressing the chapter
-      // thesis: text → voice. Restrained, not a paragraph.
-      introLines: ['the typing', 'became a voice.'],
+      // Chapter thesis expressed as a single restrained record line: text → voice.
+      introLines: ['FROM TYPING TO VOICE'],
     },
 
     // Beat 02 — The Signal: the fragility of the HelloTalk connection.
@@ -52,8 +51,6 @@ export const chapter02Data = {
         { word: 'thambi', note: 'she kept calling you thambi.' }, // [VERIFY] repeated usage
         // "akka" flip: user jokingly had the other person call him "akka". (§3)
         { word: 'akka', note: 'you joked: call me akka.' }, // [VERIFY] exact phrasing
-        // "vanga" / "ponga" — recurring verbal motif, both roughly "come". (§3)
-        { word: 'vanga · ponga', note: 'two ways of saying "come".' }, // [VERIFY] exact usage
         // Early Japanese study; the other person asked to be taught. (§1)
         { word: '日本語', note: 'she asked you to teach her japanese.' }, // [VERIFY] timing
         // User knew less English; other person fluent — became light teasing. (§3)

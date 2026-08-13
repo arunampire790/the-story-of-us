@@ -3,6 +3,7 @@ import Atmosphere from './components/shared/Atmosphere'
 import LoadingScreen from './components/loading/LoadingScreen'
 import DesignLab from './components/DesignLab'
 import Chapter01 from './sections/Chapter01'
+import Chapter02 from './sections/Chapter02'
 import { useSmoothScroll } from './hooks/useSmoothScroll'
 
 // ?lab=1 renders the dev-only DesignLab instead of the real experience.
@@ -21,7 +22,14 @@ function App() {
       {!booted && <LoadingScreen onExit={() => setBooted(true)} />}
 
       <main className="relative z-10" inert={!booted}>
-        {isLab ? <DesignLab /> : <Chapter01 />}
+        {isLab ? (
+          <DesignLab />
+        ) : (
+          <>
+            <Chapter01 />
+            <Chapter02 />
+          </>
+        )}
       </main>
     </>
   )
