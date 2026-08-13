@@ -109,3 +109,52 @@ export function createRoomScrollChoreography(scope, { reduced = false } = {}) {
 
   return timeline
 }
+
+// Phase 5C — Beat 01 → Beat 02 transition.
+// Scroll-driven "decompression": as Beat 01 finishes leaving the top of the
+// viewport, its narrative text recedes (fades out) and the rings slowly
+// expand outward (scale only — the CSS pulse keeps owning ring opacity)
+// while Beat 02 settles in below. No pinning, no scroll hijack.
+// Runs AFTER the scroll choreography window (sequential, no property fights).
+// Reduced motion: no transition (timeline created, never run).
+export function createRoomToEntryTransition(scope, { reduced = false } = {}) {
+  const timeline = gsap.timeline({ defaults: { ease: 'none' }, scope })
+
+  timeline
+    .fromTo(
+      '[data-beat01="metadata"]',
+      { opacity: 1 },
+      { opacity: 0, duration: 1 },
+      0,
+    )
+    .fromTo(
+      '[data-beat01="title"]',
+      { opacity: 1 },
+      { opacity: 0, duration: 1 },
+      0,
+    )
+    .fromTo(
+      '[data-beat01="memory"]',
+      { opacity: 1 },
+      { opacity: 0, duration: 1 },
+      0,
+    )
+    .fromTo(
+      '[data-beat01="rings"]',
+      { scale: 1 },
+      { scale: 1.08, duration: 1 },
+      0,
+    )
+
+  if (!reduced) {
+    ScrollTrigger.create({
+      trigger: scope,
+      start: 'top -40%',
+      end: 'top -120%',
+      scrub: 0.7,
+      animation: timeline,
+    })
+  }
+
+  return timeline
+}

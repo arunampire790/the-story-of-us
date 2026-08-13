@@ -4,15 +4,17 @@ import { useReducedMotion } from '../../hooks/useReducedMotion'
 import {
   createRoomEntranceTimeline,
   createRoomScrollChoreography,
+  createRoomToEntryTransition,
 } from '../../animations/chapter01'
 import SignalRings from './SignalRings'
 
 // BEAT 01 — THE ROOM
 // The visitor discovers the first trace of the relationship.
 // Editorial cinematic composition, NOT a HelloTalk clone/chat/screenshot/UI.
-// Two GSAP timelines on the same section, both scoped and StrictMode-safe:
+// Three GSAP timelines on the same section, all scoped and StrictMode-safe:
 //   1. Entrance — played once when the section approaches the viewport.
 //   2. Subtle scrubbed parallax — gentle "breathing" tied to scroll.
+//   3. Beat 01 → Beat 02 decompression — Beat 01 recedes as it exits.
 // No pinning, no scene transitions, no scroll drivers.
 export default function Beat01TheRoom({ data }) {
   const rootRef = useRef(null)
@@ -29,6 +31,14 @@ export default function Beat01TheRoom({ data }) {
   useGSAP(
     () => {
       const timeline = createRoomScrollChoreography(rootRef.current, { reduced })
+      return () => timeline.kill()
+    },
+    { scope: rootRef, dependencies: [reduced] },
+  )
+
+  useGSAP(
+    () => {
+      const timeline = createRoomToEntryTransition(rootRef.current, { reduced })
       return () => timeline.kill()
     },
     { scope: rootRef, dependencies: [reduced] },
