@@ -14,12 +14,17 @@
   > "could you please teach me coding?"
 
 - The first technical lesson taught was a **beginner-level leap-year program** written in C.
+- The **HelloTalk voice-room interface** used as a reference is a **visual reference** to the actual interaction environment — it is **not** the other person's ID.
+- The HelloTalk **signal was often weak**. `[VERIFY]`
+- During the early period the user was **studying Japanese**; the other person asked the user to **teach Japanese / send Japanese study material**. `[VERIFY]` exact timing within the early period.
 
 ---
 
 ## 2. Transition off HelloTalk
 
 - The connection moved from HelloTalk to **Instagram**, where the relationship deepened.
+- The **Instagram ID was obtained because the HelloTalk signal was weak**; the user suggested continuing the conversation on Instagram. `[VERIFY]` exact date.
+- Communication **later included Telegram**. `[VERIFY]` when Telegram entered the flow.
 
 ---
 
@@ -28,6 +33,9 @@
 - The two spoke in a mix of English and Tamil.
 - **"thambi"** (term of address used by one person toward the other) / **"akka"** (term of address used by the other toward them) formed an asymmetric, affectionate pattern of address.
 - **"vanga"** and **"ponga"** — both are Tamil-ish verbs meaning "come" (roughly "come here" / directional variants). Used as a recurring verbal motif. Exact usage context `[VERIFY]`.
+- The other person **repeatedly called the user "thambi"**.
+- During light flirting the user **jokingly threatened/teased that the other person should call him "akka"**. `[VERIFY]` exact phrasing.
+- The user knew **less English** while the other person spoke English fluently, a difference that became **light teasing**. `[VERIFY]` exact phrasing.
 
 ---
 
@@ -35,6 +43,8 @@
 
 - They had **daily calls** — a core, regular rhythm of the relationship.
 - **"amma teasing"** — one person's mother teased them about the calls / the relationship. Exact content of the teasing `[VERIFY]`.
+- The other person **joked that she would tell the user's mother**: "unga paiyan ponnunga kitta poi flirt pannitu irukan." Exact spelling/transcription `[VERIFY]`.
+- These daily-call memories belong to the **later communication warmth period**; they must not be treated as the core of the Voice Room chapter unless explicitly supported by chronology.
 
 ---
 
@@ -109,6 +119,8 @@
 
 ## 12. Preserved uncertainty — recorded timestamp
 
+- On **July 17 night**, because both **Instagram and Telegram signals were unusable**, she called the user's **phone number**.
+- The other person initially **hesitated to give her phone number**, but **obtained the user's number through Telegram**. `[VERIFY]` exact sequence/timing.
 - The start time of the **July 17 call** is currently recorded as:
 
   > **"7.70 PM"**
