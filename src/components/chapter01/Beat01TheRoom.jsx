@@ -1,15 +1,19 @@
 import { useRef } from 'react'
 import { useGSAP } from '@gsap/react'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
-import { createRoomEntranceTimeline } from '../../animations/chapter01'
+import {
+  createRoomEntranceTimeline,
+  createRoomScrollChoreography,
+} from '../../animations/chapter01'
 import SignalRings from './SignalRings'
 
 // BEAT 01 — THE ROOM
 // The visitor discovers the first trace of the relationship.
 // Editorial cinematic composition, NOT a HelloTalk clone/chat/screenshot/UI.
-// Entrance driven by a single finite GSAP timeline (transform/opacity only)
-// that is ScrollTrigger-played once when this section approaches the viewport.
-// cleanup-safe under StrictMode. No pinning, no scrubbing, no scroll drivers.
+// Two GSAP timelines on the same section, both scoped and StrictMode-safe:
+//   1. Entrance — played once when the section approaches the viewport.
+//   2. Subtle scrubbed parallax — gentle "breathing" tied to scroll.
+// No pinning, no scene transitions, no scroll drivers.
 export default function Beat01TheRoom({ data }) {
   const rootRef = useRef(null)
   const reduced = useReducedMotion()
@@ -17,6 +21,14 @@ export default function Beat01TheRoom({ data }) {
   useGSAP(
     () => {
       const timeline = createRoomEntranceTimeline(rootRef.current, { reduced })
+      return () => timeline.kill()
+    },
+    { scope: rootRef, dependencies: [reduced] },
+  )
+
+  useGSAP(
+    () => {
+      const timeline = createRoomScrollChoreography(rootRef.current, { reduced })
       return () => timeline.kill()
     },
     { scope: rootRef, dependencies: [reduced] },
