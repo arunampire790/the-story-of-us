@@ -4,8 +4,9 @@ import LoadingScreen from './components/loading/LoadingScreen'
 import DesignLab from './components/DesignLab'
 import Chapter01 from './sections/Chapter01'
 
-// TEMPORARY: DesignLab is a dev-only visual test page.
-// Keep it available for development validation; not part of the story.
+// ?lab=1 renders the dev-only DesignLab instead of the real experience.
+const isLab = new URLSearchParams(window.location.search).get('lab') === '1'
+
 function App() {
   const [booted, setBooted] = useState(false)
 
@@ -16,8 +17,7 @@ function App() {
       {!booted && <LoadingScreen onExit={() => setBooted(true)} />}
 
       <main className="relative z-10" inert={!booted}>
-        <DesignLab />
-        <Chapter01 />
+        {isLab ? <DesignLab /> : <Chapter01 />}
       </main>
     </>
   )
