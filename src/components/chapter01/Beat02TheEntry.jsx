@@ -11,6 +11,10 @@ import { useReducedMotion } from '../../hooks/useReducedMotion'
 // reveal progressively, then the final memory and narrator lines fade in.
 // The entrance is ScrollTrigger-gated so the content emerges as Beat 01
 // transitions away (one memory → the next), not a mount-appear below.
+// A mild scrubbed parallax on the whole beat keeps it reading as a continuous
+// vertical cinematic experience (same cadence as Beat 01).
+// The C-code card "materializes" during the user's reveal, so the interaction
+// reads as discovering a memory, not clicking a generic UI card.
 // GSAP via useGSAP (finite timelines, StrictMode-safe). No loops.
 export default function Beat02TheEntry({ data }) {
   const rootRef = useRef(null)
@@ -53,8 +57,8 @@ export default function Beat02TheEntry({ data }) {
     { scope: rootRef, dependencies: [reduced] },
   )
 
-  // ---- Reveal: triggered only by user activation ----
-  useGSAP(
+// ---- Reveal: triggered only by user activation ----
+useGSAP(
     () => {
       if (!revealed) return
       const reveal = gsap
@@ -70,6 +74,11 @@ export default function Beat02TheEntry({ data }) {
           { opacity: 0 },
           { opacity: 1, duration: reduced ? 0 : 0.5 },
           reduced ? 0 : 0.2,
+        )
+        .to(
+          '[data-beat02="code-card"]',
+          { opacity: 1, duration: reduced ? 0 : 0.7 },
+          reduced ? 0 : 0.4,
         )
         .fromTo(
           '[data-beat02="code-line"]',
@@ -96,6 +105,28 @@ export default function Beat02TheEntry({ data }) {
     { scope: rootRef, dependencies: [revealed, reduced] },
   )
 
+  // ---- Continuous scroll breathing (matches Beat 01's cadence) ----
+  useGSAP(
+    () => {
+      const parallax = gsap
+        .timeline({ defaults: { ease: 'none' } })
+        .fromTo('[data-beat02="content"]', { y: 0 }, { y: -18, duration: 1 })
+
+      if (reduced) return () => parallax.kill()
+
+      ScrollTrigger.create({
+        trigger: rootRef.current,
+        start: 'top 85%',
+        end: 'bottom 45%',
+        scrub: 0.6,
+        animation: parallax,
+      })
+
+      return () => parallax.kill()
+    },
+    { scope: rootRef, dependencies: [reduced] },
+  )
+
   const handleReveal = () => {
     if (!revealed) setRevealed(true)
   }
@@ -107,7 +138,7 @@ export default function Beat02TheEntry({ data }) {
       aria-label={data.title}
       aria-busy={!revealed}
     >
-      <div className="w-full max-w-3xl text-center">
+      <div data-beat02="content" className="w-full max-w-3xl text-center">
         {/* Metadata */}
         <p data-beat02="meta" className="font-metadata text-xs uppercase tracking-[0.35em] text-text-muted">
           {data.label} · {data.roomLabel} · {data.year}
@@ -143,7 +174,7 @@ export default function Beat02TheEntry({ data }) {
 
           {/* Reconstructed code artifact */}
           <div className="mt-6 w-full max-w-xl text-left">
-            <pre className="overflow-x-auto border border-border bg-surface p-6 font-mono text-sm leading-6 text-text">
+            <pre data-beat02="code-card" className="overflow-x-auto border border-border bg-surface p-6 font-mono text-sm leading-6 text-text opacity-60">
               <code>
                 {data.reconstructedLines.map((line, index) => (
                   <div key={`${index}-${line}`} data-beat02="code-line" className="whitespace-pre opacity-0">
