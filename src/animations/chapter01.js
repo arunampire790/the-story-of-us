@@ -4,16 +4,16 @@ import gsap, { ScrollTrigger } from './setup'
 // Story-agnostic: these functions receive a scope/ref and orchestrate
 // animation ONLY. They must never import story data.
 //
-// Entrance (Phase 5A):
-//   - Single finite timeline (transform/opacity only), paused until the
-//     section top reaches 80% of the viewport, plays exactly once.
-//   - Rings scale 0.85 → 1 and reveal; opacity reveal only.
+// Visual direction (correction pass):
+//   Beat 01's question is the emotional focal point; the concentric rings
+//   are a quiet secondary motif that BECOMES the bridge during the exit
+//   seam. Scroll windows are sequential (no property fights):
+//     entrance  : top 80%            (plays once)
+//     parallax  : top 60% → top -20% (scrubbed "breathing")
+//     exit seam : top -20% → -100%   (question recedes, rings take over)
 //
-// Scroll choreography (Phase 5B):
-//   - A separate, scrubbed timeline drives subtle parallax "breathing"
-//     as Beat 01 passes through the viewport. No pinning.
-//   - Continuous opacity on the rings is left to the CSS pulse; this
-//     timeline only touches transforms.
+// Animation ownership: GSAP never touches the CSS-owned opacity/scale pulse
+// on the ring circles — it only transforms the rings WRAPPER.
 
 export function createRoomEntranceTimeline(scope, { reduced = false } = {}) {
   const timeline = gsap.timeline({
@@ -37,15 +37,15 @@ export function createRoomEntranceTimeline(scope, { reduced = false } = {}) {
       reduced ? 0 : 0.35,
     )
     .fromTo(
-      '[data-beat01="rings"]',
-      { opacity: 0, scale: 0.85 },
-      { opacity: 1, scale: 1, duration: reduced ? 0 : 0.7 },
+      '[data-beat01="memory"]',
+      { opacity: 0, y: 18 },
+      { opacity: 1, y: 0, duration: reduced ? 0 : 0.8 },
       reduced ? 0 : 0.7,
     )
     .fromTo(
-      '[data-beat01="memory"]',
-      { opacity: 0, y: 16 },
-      { opacity: 1, y: 0, duration: reduced ? 0 : 0.8 },
+      '[data-beat01="rings"]',
+      { opacity: 0, scale: 0.85 },
+      { opacity: 1, scale: 1, duration: reduced ? 0 : 0.7 },
       reduced ? 0 : 1.05,
     )
 
@@ -60,40 +60,36 @@ export function createRoomEntranceTimeline(scope, { reduced = false } = {}) {
   return timeline
 }
 
-// Phase 5B — subtle, scrubbed parallax for Beat 01.
-// Gentler than the entrance: text drifts at slightly different speeds and
-// the rings breathe (scale only) as the section scrolls through the viewport.
-// Continuous ring opacity stays owned by the CSS pulse (independent).
-// Reduced motion: no scroll choreography at all (timeline created, never run).
+// Phase 5B — subtle, scrubbed parallax while Beat 01 is in view.
+// The question recedes gently upward (leading the eye toward the rings).
+// Continuous ring opacity stays owned by the CSS pulse.
+// Reduced motion: no scroll choreography (timeline created, never run).
 export function createRoomScrollChoreography(scope, { reduced = false } = {}) {
-  const timeline = gsap.timeline({
-    defaults: { ease: 'none' },
-    scope,
-  })
+  const timeline = gsap.timeline({ defaults: { ease: 'none' }, scope })
 
   timeline
     .fromTo(
       '[data-beat01="metadata"]',
       { y: 0 },
-      { y: -8, duration: 1 },
+      { y: -6, duration: 1 },
       0,
     )
     .fromTo(
       '[data-beat01="title"]',
       { y: 0 },
-      { y: -14, duration: 1 },
-      0,
-    )
-    .fromTo(
-      '[data-beat01="rings"]',
-      { scale: 0.985 },
-      { scale: 1.015, duration: 1 },
+      { y: -10, duration: 1 },
       0,
     )
     .fromTo(
       '[data-beat01="memory"]',
       { y: 0 },
-      { y: 18, duration: 1 },
+      { y: -16, duration: 1 },
+      0,
+    )
+    .fromTo(
+      '[data-beat01="rings"]',
+      { scale: 0.985 },
+      { scale: 1.02, duration: 1 },
       0,
     )
 
@@ -101,7 +97,7 @@ export function createRoomScrollChoreography(scope, { reduced = false } = {}) {
     ScrollTrigger.create({
       trigger: scope,
       start: 'top 60%',
-      end: 'bottom 40%',
+      end: 'top -20%',
       scrub: 0.6,
       animation: timeline,
     })
@@ -110,12 +106,11 @@ export function createRoomScrollChoreography(scope, { reduced = false } = {}) {
   return timeline
 }
 
-// Phase 5C — Beat 01 → Beat 02 transition.
-// Scroll-driven "decompression": as Beat 01 finishes leaving the top of the
-// viewport, its narrative text recedes (fades out) and the rings slowly
-// expand outward (scale only — the CSS pulse keeps owning ring opacity)
-// while Beat 02 settles in below. No pinning, no scroll hijack.
-// Runs AFTER the scroll choreography window (sequential, no property fights).
+// Phase 5C — Beat 01 → Beat 02 transition. One memory → the next.
+// As Beat 01 leaves the viewport, visual attention shifts from the question
+// to the rings: the question recedes upward while the rings expand outward
+// (wrapper transform only — the CSS pulse is untouched) and hold the center
+// of the frame as Beat 02's content emerges below. No pin, no scroll hijack.
 // Reduced motion: no transition (timeline created, never run).
 export function createRoomToEntryTransition(scope, { reduced = false } = {}) {
   const timeline = gsap.timeline({ defaults: { ease: 'none' }, scope })
@@ -124,33 +119,33 @@ export function createRoomToEntryTransition(scope, { reduced = false } = {}) {
     .fromTo(
       '[data-beat01="metadata"]',
       { opacity: 1 },
-      { opacity: 0, duration: 1 },
+      { opacity: 0, duration: 0.35 },
       0,
     )
     .fromTo(
       '[data-beat01="title"]',
       { opacity: 1 },
-      { opacity: 0, duration: 1 },
+      { opacity: 0, duration: 0.35 },
       0,
     )
     .fromTo(
       '[data-beat01="memory"]',
-      { opacity: 1 },
-      { opacity: 0, duration: 1 },
-      0,
+      { opacity: 1, y: -16 },
+      { opacity: 0, y: -24, duration: 0.45 },
+      0.15,
     )
     .fromTo(
       '[data-beat01="rings"]',
-      { scale: 1 },
-      { scale: 1.08, duration: 1 },
-      0,
+      { y: 0, scale: 1.02 },
+      { y: -48, scale: 1.4, duration: 0.5 },
+      0.4,
     )
 
   if (!reduced) {
     ScrollTrigger.create({
       trigger: scope,
-      start: 'top -40%',
-      end: 'top -120%',
+      start: 'top -20%',
+      end: 'top -100%',
       scrub: 0.7,
       animation: timeline,
     })

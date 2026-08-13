@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { useGSAP } from '@gsap/react'
-import gsap from '../../animations/setup'
+import gsap, { ScrollTrigger } from '../../animations/setup'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 
 // BEAT 02 — THE ENTRY
@@ -9,43 +9,45 @@ import { useReducedMotion } from '../../hooks/useReducedMotion'
 // Before interaction: quiet archival composition with a visible button.
 // After interaction: button fades, RECONSTRUCTION label appears, code lines
 // reveal progressively, then the final memory and narrator lines fade in.
+// The entrance is ScrollTrigger-gated so the content emerges as Beat 01
+// transitions away (one memory → the next), not a mount-appear below.
 // GSAP via useGSAP (finite timelines, StrictMode-safe). No loops.
 export default function Beat02TheEntry({ data }) {
   const rootRef = useRef(null)
   const [revealed, setRevealed] = useState(false)
   const reduced = useReducedMotion()
 
-  // ---- Entrance: the archival card before interaction ----
+  // ---- Entrance: the archival card, revealed as Beat 01 transitions away ----
   useGSAP(
     () => {
-      const entrance = gsap
-        .timeline({ defaults: { ease: 'power2.out' }, delay: reduced ? 0 : 0.1 })
-        .fromTo(
-          '[data-beat02="meta"]',
-          { opacity: 0, y: 10 },
-          { opacity: 1, y: 0, duration: reduced ? 0 : 0.6 },
-          0,
-        )
-        .fromTo(
-          '[data-beat02="heading"]',
-          { opacity: 0, y: 14 },
-          { opacity: 1, y: 0, duration: reduced ? 0 : 0.7 },
-          reduced ? 0 : 0.25,
-        )
-        .fromTo(
-          '[data-beat02="body"]',
-          { opacity: 0, y: 14 },
-          { opacity: 1, y: 0, duration: reduced ? 0 : 0.7 },
-          reduced ? 0 : 0.5,
-        )
-        .fromTo(
-          '[data-beat02="button"]',
-          { opacity: 0, y: 10 },
-          { opacity: 1, y: 0, duration: reduced ? 0 : 0.6 },
-          reduced ? 0 : 0.7,
-        )
+      const targets = {
+        meta: '[data-beat02="meta"]',
+        heading: '[data-beat02="heading"]',
+        body: '[data-beat02="body"]',
+        button: '[data-beat02="button"]',
+      }
 
-      entrance.play()
+      // Explicit hidden start state so nothing shows before the trigger fires.
+      gsap.set(targets.meta, { opacity: 0, y: 10 })
+      gsap.set(targets.heading, { opacity: 0, y: 14 })
+      gsap.set(targets.body, { opacity: 0, y: 14 })
+      gsap.set(targets.button, { opacity: 0, y: 10 })
+
+      const entrance = gsap
+        .timeline({ defaults: { ease: 'power2.out' }, paused: true })
+        .to(targets.meta, { opacity: 1, y: 0, duration: reduced ? 0 : 0.6 }, 0)
+        .to(targets.heading, { opacity: 1, y: 0, duration: reduced ? 0 : 0.7 }, reduced ? 0 : 0.25)
+        .to(targets.body, { opacity: 1, y: 0, duration: reduced ? 0 : 0.7 }, reduced ? 0 : 0.5)
+        .to(targets.button, { opacity: 1, y: 0, duration: reduced ? 0 : 0.6 }, reduced ? 0 : 0.7)
+
+      ScrollTrigger.create({
+        trigger: rootRef.current,
+        start: 'top 70%',
+        toggleActions: 'play none none none',
+        once: true,
+        animation: entrance,
+      })
+
       return () => entrance.kill()
     },
     { scope: rootRef, dependencies: [reduced] },

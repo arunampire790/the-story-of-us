@@ -59,21 +59,21 @@ export default function Beat01TheRoom({ data }) {
 
       <h1
         data-beat01="title"
-        className="mt-6 font-display text-4xl font-medium leading-none text-text sm:text-6xl"
+        className="mt-6 font-display text-3xl font-medium leading-none text-text sm:text-5xl"
       >
         {data.title}
       </h1>
 
-      <div data-beat01="rings" className="mt-10 w-40 origin-center sm:w-52">
-        <SignalRings />
-      </div>
-
       <blockquote
         data-beat01="memory"
-        className="mt-12 max-w-2xl font-quote text-2xl font-light leading-relaxed text-text sm:text-4xl"
+        className="mt-10 max-w-2xl font-quote text-4xl font-light leading-relaxed text-accent-warm sm:text-6xl"
       >
         {data.roomDescription}
       </blockquote>
+
+      <div data-beat01="rings" className="mt-14 w-40 origin-center sm:w-52">
+        <SignalRings />
+      </div>
     </section>
   )
 }
