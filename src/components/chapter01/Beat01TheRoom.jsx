@@ -7,8 +7,9 @@ import SignalRings from './SignalRings'
 // BEAT 01 — THE ROOM
 // The visitor discovers the first trace of the relationship.
 // Editorial cinematic composition, NOT a HelloTalk clone/chat/screenshot/UI.
-// Entrance via a single finite GSAP timeline (transform/opacity only),
-// cleanup-safe under StrictMode. No pinning, no scroll drivers.
+// Entrance driven by a single finite GSAP timeline (transform/opacity only)
+// that is ScrollTrigger-played once when this section approaches the viewport.
+// cleanup-safe under StrictMode. No pinning, no scrubbing, no scroll drivers.
 export default function Beat01TheRoom({ data }) {
   const rootRef = useRef(null)
   const reduced = useReducedMotion()
@@ -16,7 +17,6 @@ export default function Beat01TheRoom({ data }) {
   useGSAP(
     () => {
       const timeline = createRoomEntranceTimeline(rootRef.current, { reduced })
-      timeline.play()
       return () => timeline.kill()
     },
     { scope: rootRef, dependencies: [reduced] },
