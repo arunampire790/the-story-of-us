@@ -1,8 +1,8 @@
 import { useRef } from 'react'
 import { useGSAP } from '@gsap/react'
-import gsap from '../../animations/setup'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
-import SignalLine from './SignalLine'
+import { createRoomEntranceTimeline } from '../../animations/chapter01'
+import SignalRings from './SignalRings'
 
 // BEAT 01 — THE ROOM
 // The visitor discovers the first trace of the relationship.
@@ -15,38 +15,8 @@ export default function Beat01TheRoom({ data }) {
 
   useGSAP(
     () => {
-      const timeline = gsap
-        .timeline({
-          defaults: { ease: 'power2.out' },
-          delay: reduced ? 0 : 0.2,
-        })
-        .fromTo(
-          '[data-beat01="metadata"]',
-          { opacity: 0, y: 12 },
-          { opacity: 1, y: 0, duration: reduced ? 0 : 0.6 },
-          0,
-        )
-        .fromTo(
-          '[data-beat01="title"]',
-          { opacity: 0, y: 16 },
-          { opacity: 1, y: 0, duration: reduced ? 0 : 0.7 },
-          reduced ? 0 : 0.35,
-        )
-        .fromTo(
-          '[data-beat01="signal-wrap"]',
-          { opacity: 0, scaleX: 0.25 },
-          { opacity: 1, scaleX: 1, duration: reduced ? 0 : 0.7 },
-          reduced ? 0 : 0.7,
-        )
-        .fromTo(
-          '[data-beat01="memory"]',
-          { opacity: 0, y: 16 },
-          { opacity: 1, y: 0, duration: reduced ? 0 : 0.8 },
-          reduced ? 0 : 1.05,
-        )
-
+      const timeline = createRoomEntranceTimeline(rootRef.current, { reduced })
       timeline.play()
-
       return () => timeline.kill()
     },
     { scope: rootRef, dependencies: [reduced] },
@@ -72,8 +42,8 @@ export default function Beat01TheRoom({ data }) {
         {data.title}
       </h1>
 
-      <div data-beat01="signal-wrap" className="mt-10 origin-center">
-        <SignalLine />
+      <div data-beat01="rings" className="mt-10 w-40 origin-center sm:w-52">
+        <SignalRings />
       </div>
 
       <blockquote

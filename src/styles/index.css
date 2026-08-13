@@ -241,6 +241,54 @@
 }
 
 /* ---------------------------------------------------------------------------
+   SIGNAL RINGS — Chapter 01 signal motif, echoing the Loading experience.
+   Three concentric SVG rings with a staggered, irregular CSS pulse
+   (transform/opacity only — GPU-friendly). Entrance is choreographed by
+   GSAP on the wrapper; this continuous pulse runs on each circle.
+   Not a progress indicator.
+--------------------------------------------------------------------------- */
+
+.signal-rings {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.signal-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: signal-ring-pulse var(--ring-duration, 6s) ease-in-out
+    var(--ring-delay, 0s) infinite;
+}
+
+.signal-ring--outer {
+  --ring-duration: 7s;
+  --ring-delay: 0s;
+}
+
+.signal-ring--middle {
+  --ring-duration: 5.5s;
+  --ring-delay: 0.8s;
+}
+
+.signal-ring--inner {
+  --ring-duration: 4.5s;
+  --ring-delay: 1.4s;
+}
+
+@keyframes signal-ring-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.2;
+    transform: scale(1.07);
+  }
+}
+
+/* ---------------------------------------------------------------------------
    REDUCED MOTION
    Collapse atmosphere + signal effects so the foundation stays usable.
 --------------------------------------------------------------------------- */
@@ -259,6 +307,12 @@
 
   .signal-line {
     /* Static signal: appears once, no continuous pulse. */
+    animation: none;
+    opacity: 0.45;
+  }
+
+  .signal-ring {
+    /* Static rings: appear once, no continuous pulse. */
     animation: none;
     opacity: 0.45;
   }
