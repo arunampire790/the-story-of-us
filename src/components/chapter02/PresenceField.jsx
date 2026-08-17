@@ -11,17 +11,14 @@ export default function PresenceField() {
       aria-hidden="true"
       role="presentation"
     >
-      {/* room-depth falloff — starts at the page base (#0b0a08) so the chapter
-          enters seamlessly from Chapter 01's closing darkness (no light band /
-          hard tonal step at the top edge); depth recedes subtly toward the
-          bottom, led by the glow/atmo layers, not a boundary line. */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            'linear-gradient(180deg, #0b0a08 0%, #0b0a08 65%, #0d0b09 100%)',
-        }}
-      />
+      {/* NO opaque full-bleed base: the cinematic base (body #0b0a08 + global
+          ambient-light + vignette + grain) is the single continuous source of
+          the black/brown grading, mounted once at the app root. If this field
+          painted its own opaque layer it would sit above the global ambient in
+          main's z-10 context and hide it, creating a hard tonal seam at the
+          chapter boundary. Only semi-transparent local atmosphere (glow/atmo)
+          is added here so the base film runs uninterrupted across chapters.
+          Transform stays Tailwind-owned. */}
 
       {/* room glow — GSAP animates opacity only (transform stays Tailwind-owned) */}
       <div

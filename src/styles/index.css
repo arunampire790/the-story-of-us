@@ -289,23 +289,6 @@
 }
 
 /* ---------------------------------------------------------------------------
-   CHAPTER 02 VOICE MOTIF
-   The concentric rings are approved but must be completely static here — no
-   continuous pulse. Scoped to Chapter 02 only (.voice-motif lives only on the
-   Chapter 02 VoiceMotif wrapper); Chapter 01's .signal-ring pulse is untouched.
-   Keeps approved stroke, opacity, size and geometry; just kills the motion.
-
-   `!important` is REQUIRED: the base pulse resides in unlayered author CSS and
-   the browser cascade (Tailwind v4 layer handling) defeated a same-specificity
-   later declaration in real rendering — QA still saw the pulse. Scoped under
-   .voice-motif, so this high-priority override cannot affect Chapter 01.
---------------------------------------------------------------------------- */
-
-.voice-motif .signal-ring {
-  animation: none !important;
-}
-
-/* ---------------------------------------------------------------------------
    REDUCED MOTION
    Collapse atmosphere + signal effects so the foundation stays usable.
 --------------------------------------------------------------------------- */

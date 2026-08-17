@@ -1,70 +1,57 @@
 import { useRef } from 'react'
 import { useGSAP } from '@gsap/react'
 import { useReducedMotion } from '../hooks/useReducedMotion'
-import { chapter02Data } from '../data/chapter02'
-import { createPresenceMasterTimeline } from '../animations/chapter02'
+import { createSignalTravelTimeline } from '../animations/chapter02'
 import PresenceField from '../components/chapter02/PresenceField'
-import PresenceLights from '../components/chapter02/PresenceLights'
-import VoiceMotif from '../components/chapter02/VoiceMotif'
-import Beat01Arrival from '../components/chapter02/Beat01Arrival'
-import Beat02Signal from '../components/chapter02/Beat02Signal'
-import Beat03Voice from '../components/chapter02/Beat03Voice'
-import Beat04Continuing from '../components/chapter02/Beat04Continuing'
+import SignalTravel from '../components/chapter02/SignalTravel'
 
-// CHAPTER 02 — THE VOICE ROOM
-// ONE continuous, FULL-VIEWPORT living room. A sticky room window (PresenceField
-// + PresenceLights) persists across all four beats while the beat content
-// scrolls over it, driven by one chapter-scoped master timeline. Covers
-// distance → fragility → warmth → continuation → rest, stopping before the
-// daily-call cadence and July 17/18. No chapter-break screen, no navigation.
+// CHAPTER 02 — HERO PROTOTYPE (Phase 9G): "THE SIGNAL TRAVELS"
 //
-// The outer element is deliberately NOT max-width (no w-cinematic): the room
-// must span the full viewport so the camera feels INSIDE the environment, not
-// looking at a centered 78rem panel. Beat content stays positioned/centered on
-// its own (readable) constraints, so full-bleed here never hurts legibility.
+// ONE continuous scroll scene, no narrative beats:
+//   • a small origin point (the signal),
+//   • a single thin connection path that extends as the user scrolls,
+//   • a destination presence point the path approaches,
+//   • a quiet settle at the end.
+// origin → travel → arrival, read without any explanatory text.
+//
+// The sticky, full-viewport stage owns the whole geometry (SignalTravel SVG,
+// scaled to fit with breathing room so nothing is clipped). PresenceField
+// provides the existing dark environment / depth falloff (#0b0a08 → seamless
+// entry from Chapter 01's closing darkness). The origin sits on the page's
+// horizontal centre, so it visually emerges from Chapter 01's centred closing
+// space. A tall runway gives ScrollTrigger the scroll distance to scrub the
+// draw; reverse scrolling works naturally.
+//
+// This is a prototype ONLY. The four-beat story (Beat01–04) is intentionally
+// not rendered here — no redesign of the real chapter yet.
+
 export default function Chapter02() {
-  const { meta, beats } = chapter02Data
   const rootRef = useRef(null)
   const reduced = useReducedMotion()
 
   useGSAP(
     () => {
-      const timeline = createPresenceMasterTimeline(rootRef.current, { reduced })
-      return () => timeline.kill()
+      const timeline = createSignalTravelTimeline(rootRef.current, { reduced })
+      return () => timeline?.kill()
     },
     { scope: rootRef, dependencies: [reduced] },
   )
 
   return (
     <section
-      id={meta.id}
-      data-anchor={meta.anchor}
+      id="chapter-02"
+      data-anchor="voice-room"
       ref={rootRef}
       className="relative w-full"
     >
-      {/* persistent room (sticky, full width, stays while beats scroll over it) */}
+      {/* sticky stage — holds the persistent environment + the travel geometry */}
       <div className="sticky top-0 z-0 h-[100svh] w-full">
         <PresenceField />
-        <PresenceLights />
+        <SignalTravel />
       </div>
 
-      {/* beat content scrolls over the persistent room */}
-      <div className="relative z-10 -mt-[100svh]">
-        <Beat01Arrival data={beats.beat01} />
-        <Beat02Signal data={beats.beat02} />
-        <Beat03Voice data={beats.beat03} />
-        <Beat04Continuing data={beats.beat04} />
-
-        {/* resting breathing space: dimmed aperture + generous empty height */}
-        <div
-          aria-hidden="true"
-          className="flex min-h-[60svh] items-center justify-center px-6"
-        >
-          <div className="w-24 opacity-50 sm:w-32">
-            <VoiceMotif />
-          </div>
-        </div>
-      </div>
+      {/* runway — scroll distance that drives the connection travel */}
+      <div aria-hidden="true" className="relative -mt-[100svh] min-h-[260svh]" />
     </section>
   )
 }

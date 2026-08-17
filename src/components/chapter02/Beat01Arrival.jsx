@@ -2,14 +2,14 @@ import { useRef } from 'react'
 import { useGSAP } from '@gsap/react'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { createArrivalEntrance } from '../../animations/chapter02'
-import VoiceMotif from './VoiceMotif'
 
 // BEAT 01 — ARRIVAL: entering the voice room.
 // Large negative space; the chapter title sits low / bottom-left (editorial,
-// NOT a centered stack); the aperture rings open above as the doorway; a small
-// record marks the text→voice threshold. The other person's presence is NOT
-// rendered here — it lives far away in the global PresenceLights layer.
-// Beat-level timeline reveals local content only.
+// NOT a centered stack); the Presence Field/Lights environment (thread +
+// presence dot) is the only visual — no ring motif. A small record marks the
+// text→voice threshold. The other person's presence is NOT rendered here — it
+// lives far away in the global PresenceLights layer. Beat timeline reveals
+// local content only.
 export default function Beat01Arrival({ data }) {
   const rootRef = useRef(null)
   const reduced = useReducedMotion()
@@ -47,17 +47,6 @@ export default function Beat01Arrival({ data }) {
         >
           {data.introLines.join(' ')}
         </p>
-      </div>
-
-      {/* aperture / doorway — positioning wrapper + GSAP-animated inner.
-          Sized by the viewport's smaller dimension (vmin) so the full concentric
-          ring set (outer/middle/inner, ~0.84× wrapper width each on a square
-          SVG) always fits inside the first viewport on any screen — dominant,
-          never clipped, with negative space below for the bottom-left title. */}
-      <div className="pointer-events-none absolute left-1/2 top-[14%] w-[min(40vmin,24rem)] -translate-x-1/2">
-        <div data-arrival="aperture" className="origin-center">
-          <VoiceMotif />
-        </div>
       </div>
     </section>
   )
