@@ -289,9 +289,24 @@
 }
 
 /* ---------------------------------------------------------------------------
+   CHAPTER 03 — THE LOCK
+   A small interactive memory checkpoint. The input chamber reads as part of
+   the lock object; the nickname unlock is state-driven (never scroll-gated).
+   Copy (teasing lines + hints) is UI/game copy only. The dial and field are
+   decorative and scrub-revealed by the Chapter 03 timeline via data-lk.
+-------------------------------------------------------------------------- */
+
+[data-lk="chamber"] input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.6;
+}
+
+/* Minimal, on-theme focus treatment for the integrated chamber/control. */
+
+/* ---------------------------------------------------------------------------
    REDUCED MOTION
    Collapse atmosphere + signal effects so the foundation stays usable.
---------------------------------------------------------------------------- */
+-------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
   html,
@@ -315,5 +330,11 @@
     /* Static rings: appear once, no continuous pulse. */
     animation: none;
     opacity: 0.45;
+  }
+
+  [data-lk] {
+    /* Reduced motion: no shake, no dial rotation, no floating, no transition-
+       dependent information. The lock remains fully usable. */
+    transition: none;
   }
 }
