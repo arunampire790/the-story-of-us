@@ -9,9 +9,21 @@ import SignalRings from '../chapter01/SignalRings'
 // Decorative only (aria-hidden). GSAP animates only the wrapper.
 export default function VoiceMotif() {
   return (
-    <div className="relative mx-auto w-full" role="presentation" aria-hidden="true">
-      <div className="absolute inset-0 rounded-full" style={{ background: 'radial-gradient(circle, rgba(200, 161, 101, 0.18), rgba(200, 161, 101, 0.04) 55%, transparent 70%)' }} />
-      <div className="relative w-full"><SignalRings /></div>
+    <div
+      className="relative mx-auto w-full"
+      role="presentation"
+      aria-hidden="true"
+    >
+      <div
+        className="absolute inset-0 rounded-full"
+        style={{
+          background:
+            'radial-gradient(circle, rgba(200, 161, 101, 0.18), rgba(200, 161, 101, 0.04) 55%, transparent 70%)',
+        }}
+      />
+      <div className="relative w-full">
+        <SignalRings />
+      </div>
     </div>
   )
 }

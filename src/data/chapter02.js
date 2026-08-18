@@ -18,34 +18,58 @@ export const chapter02Data = {
     title: 'The Voice Room',
   },
   beats: {
+    // Beat 01 — The Voice Room: the room where the typed signal becomes a voice.
+    // platform / roomLabel reuse the established labels from chapter01.js.
     beat01: {
       id: 'the-voice-room',
       chapter: 'Chapter 02',
       title: 'The Voice Room',
       platform: 'HelloTalk',
       roomLabel: 'Voice Room',
+      // Minimal connector lines (approved-copy category) expressing the chapter
+      // thesis: text → voice. Restrained, not a paragraph.
       introLines: ['the typing', 'became a voice.'],
     },
+
+    // Beat 02 — The Signal: the fragility of the HelloTalk connection.
+    // "HelloTalk signal was often weak" -> PROJECT_CONTEXT §1; MEMORY_MOTIFS §1.
     beat02: {
       id: 'the-signal',
       title: 'The Signal',
-      bodyLines: ['the hellotalk signal', 'was often weak.'],
+      bodyLines: [
+        'the hellotalk signal',
+        'was often weak.', // [VERIFY] PROJECT_CONTEXT §1 / MEMORY_MOTIFS §1
+      ],
     },
+
+    // Beat 03 — In the Voice: restrained, small factual fragments (NOT paragraphs).
+    // Each is a verified record from PROJECT_CONTEXT / MEMORY_MOTIFS.
     beat03: {
       id: 'the-voice',
       title: 'In the Voice',
       fragments: [
-        { word: 'thambi', note: 'she kept calling you thambi.' },
-        { word: 'akka', note: 'you joked: call me akka.' },
-        { word: 'vanga · ponga', note: 'two ways of saying "come".' },
-        { word: '日本語', note: 'she asked you to teach her japanese.' },
-        { word: 'english', note: 'you knew less; she was fluent.' },
+        // The other person repeatedly called the user "thambi". (§3)
+        { word: 'thambi', note: 'she kept calling you thambi.' }, // [VERIFY] repeated usage
+        // "akka" flip: user jokingly had the other person call him "akka". (§3)
+        { word: 'akka', note: 'you joked: call me akka.' }, // [VERIFY] exact phrasing
+        // "vanga" / "ponga" — recurring verbal motif, both roughly "come". (§3)
+        { word: 'vanga · ponga', note: 'two ways of saying "come".' }, // [VERIFY] exact usage
+        // Early Japanese study; the other person asked to be taught. (§1)
+        { word: '日本語', note: 'she asked you to teach her japanese.' }, // [VERIFY] timing
+        // User knew less English; other person fluent — became light teasing. (§3)
+        { word: 'english', note: 'you knew less; she was fluent.' }, // [VERIFY] phrasing
       ],
     },
+
+    // Beat 04 — Continuing: the pivot for a steadier connection.
+    // Obtained Instagram because the HelloTalk signal was weak; later Telegram.
     beat04: {
       id: 'continuing',
       title: 'Continuing',
-      recordLines: ['so we continued on instagram.', 'later, telegram.'],
+      recordLines: [
+        'so we continued on instagram.', // [VERIFY] exact date — PROJECT_CONTEXT §2
+        'later, telegram.', // [VERIFY] when Telegram entered — PROJECT_CONTEXT §2
+      ],
     },
   },
 }
