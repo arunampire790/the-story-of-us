@@ -8,8 +8,9 @@
 //
 // Composition (top → bottom, clear vertical breathing room):
 //   CHAPTER 03 (label)  →  THE LOCK (title)  →  gap  →  LOCK OBJECT
-//   [ small combination dial ]  →  [ recessed input chamber ]  →  instruction
-//   →  UNLOCK control.
+//   [ small combination dial ]  →  [ recessed input chamber ]  →  UNLOCK
+//   control. The initial screen deliberately provides no instruction — the
+//   lock begins intentionally blind; the user figures out the answer.
 //
 // Behaviour (unchanged from the approved implementation):
 //   • Empty input → focus stays, nothing is counted (gentle, never punishing).
@@ -222,7 +223,6 @@ export default function LockCopy({ onUnlock }) {
                   value={value}
                   onChange={(e) => setValue(e.target.value)}
                   aria-label="Enter the nickname"
-                  placeholder="type the nickname"
                   autoComplete="off"
                   spellCheck="false"
                   enterKeyHint="done"
@@ -230,13 +230,6 @@ export default function LockCopy({ onUnlock }) {
                 />
                 <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-[rgba(214,180,128,0.14)]" />
               </div>
-
-              {/* one small contextual instruction — UI text, not a memory.
-                  Visually secondary to the input: establishes the act of
-                  remembering a nickname without hinting at the answer. */}
-              <p className="font-metadata mt-4 text-[0.62rem] uppercase tracking-[0.24em] text-text-muted/80">
-                the name you gave her.
-              </p>
 
               {/* unlock control — restrained, part of the object */}
               <button
