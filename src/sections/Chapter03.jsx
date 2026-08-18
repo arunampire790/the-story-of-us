@@ -69,10 +69,16 @@ export default function Chapter03() {
     { scope: rootRef, dependencies: [unlocked, reduced] },
   )
 
-  // FORWARD-ONLY SCROLL GATE. Least-invasive clamping: a scroll listener that
-  // holds the only scroll position at which Chapter 04 would start to reveal.
-  // Backward movement is untouched; the document, scrollbar and Lenis all keep
-  // working. On unlock the clamp is released immediately, mid-gesture.
+  // FORWARD-ONLY SCROLL GATE. Blocks ONLY the Ch03 → Ch04 boundary while the
+  // lock is unsolved. Within Chapter 03 scrolling is completely normal.
+  //
+  // A post-hoc scroll listener alone loses to wheel-driven scrolling: native
+  // compositor smooth-scroll AND Lenis both re-assert the position every frame
+  // (Lenis clamps only to the document limit, never to this boundary), so
+  // scrollY races past the gate before a scripted scrollTo can hold it. The
+  // gate therefore also stops the offending wheel/touch input at the source in
+  // the capture phase — before Lenis's bubble handler sees it — and snaps to
+  // the boundary, which holds deterministically. Backward input is untouched.
   useEffect(() => {
     const section = rootRef.current
     if (!section) return
@@ -84,9 +90,39 @@ export default function Chapter03() {
     }
     computeLimit()
 
+    // Backstop for scroll that already overshot the gate (keyboard, scrollbar
+    // drag, momentum, scripted scroll) — clamps back to the boundary.
     const onScroll = () => {
       if (unlockedRef.current) return
       if (window.scrollY > limit) window.scrollTo(0, limit)
+    }
+
+    // Deterministic blocker for wheel input. Capture phase so the event is
+    // stopped before Lenis can drive its internal target past the gate.
+    const onWheel = (e) => {
+      if (unlockedRef.current) return
+      if (e.deltaY <= 0) return
+      if (window.scrollY >= limit || window.scrollY + e.deltaY > limit) {
+        e.preventDefault()
+        e.stopPropagation()
+        window.scrollTo(0, limit)
+      }
+    }
+
+    // Mobile: stop the touch gesture itself from carrying past the gate.
+    // Backward swipes (finger moving down) are never touched.
+    let lastTouchY = null
+    const onTouchStart = (e) => {
+      lastTouchY = e.touches[0]?.clientY ?? null
+    }
+    const onTouchMove = (e) => {
+      if (unlockedRef.current) return
+      if (lastTouchY === null) return
+      const y = e.touches[0]?.clientY
+      if (y === undefined) return
+      const scrollingDown = y < lastTouchY
+      lastTouchY = y
+      if (window.scrollY >= limit && scrollingDown) e.preventDefault()
     }
 
     if (!unlockedRef.current) {
@@ -95,9 +131,15 @@ export default function Chapter03() {
 
     window.addEventListener('resize', computeLimit)
     window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('wheel', onWheel, { passive: false, capture: true })
+    window.addEventListener('touchstart', onTouchStart, { passive: true })
+    window.addEventListener('touchmove', onTouchMove, { passive: false })
     return () => {
       window.removeEventListener('resize', computeLimit)
       window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('wheel', onWheel, { capture: true })
+      window.removeEventListener('touchstart', onTouchStart)
+      window.removeEventListener('touchmove', onTouchMove)
       document.body.style.overscrollBehaviorY = ''
     }
   }, [])
