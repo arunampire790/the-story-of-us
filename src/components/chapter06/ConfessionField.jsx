@@ -7,10 +7,10 @@
 // silent hold.
 //
 // Environment is SUBORDINATE to typography: during the main silence event the
-// ONLY changes are a restrained grain opacity increase, a restrained
-// vignette/depth increase, and the faint atmospheric pulse. No thermal residue,
-// no light contraction, no ECG/heartbeat line, no orbit, no progress/countdown/
-// typing/bubble, no artificial drag or scroll resistance.
+// ONLY changes are a restrained grain opacity increase and a restrained
+// vignette/depth increase. No thermal residue, no light contraction, no
+// heartbeat line, no orbit, no progress/countdown/typing/bubble, no artificial
+// drag or scroll resistance.
 //
 // No opaque full-bleed base: the global cinematic base (body + ambient-light +
 // vignette + grain) carries the grading continuously (global #0b0a08), so there
@@ -57,26 +57,6 @@ export default function ConfessionField() {
           backgroundSize: '220px 220px',
           backgroundRepeat: 'repeat',
           mixBlendMode: 'overlay',
-        }}
-      />
-
-      {/* pulse — a restrained, abstract atmospheric pulse: a soft warm/cool-
-          neutral luminance on the far right, vertically centered. Pure visual
-          metaphor inspired by "en heart beat fast agudhu"; NOT a real heartbeat,
-          ECG, icon, or waveform. Opacity only, driven by the scrub. */}
-      <div
-        data-conf="pulse"
-        className="absolute"
-        style={{
-          opacity: 0,
-          right: '6%',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          width: '9vh',
-          height: '28vh',
-          borderRadius: '9999px',
-          background:
-            'radial-gradient(50% 50% at 50% 50%, rgba(214,196,166,0.16), transparent 70%)',
         }}
       />
     </div>
