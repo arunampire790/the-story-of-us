@@ -43,20 +43,22 @@ export const chapter02Data = {
     },
 
     // Beat 03 — In the Voice: restrained, small factual fragments (NOT paragraphs).
-    // Each is a verified record from PROJECT_CONTEXT / MEMORY_MOTIFS.
+    // Story-safety: "thambi" and "akka" form ONE visual pair — the two terms of
+    // address in the connection. They carry NO explanatory note: no speaker, no
+    // event, no dialogue, joke, or teasing is assigned to either word.
+    // vanga·ponga / 日本語 / english carry only their source-supported notes
+    // (PROJECT_CONTEXT §1/§3, MEMORY_MOTIFS §2).
     beat03: {
       id: 'the-voice',
       title: 'In the Voice',
       fragments: [
-        // The other person repeatedly called the user "thambi". (§3)
-        { word: 'thambi', note: 'she kept calling you thambi.' }, // [VERIFY] repeated usage
-        // "akka" flip: user jokingly had the other person call him "akka". (§3)
-        { word: 'akka', note: 'you joked: call me akka.' }, // [VERIFY] exact phrasing
+        { word: 'thambi' },
+        { word: 'akka' },
         // "vanga" / "ponga" — recurring verbal motif, both roughly "come". (§3)
         { word: 'vanga · ponga', note: 'two ways of saying "come".' }, // [VERIFY] exact usage
         // Early Japanese study; the other person asked to be taught. (§1)
         { word: '日本語', note: 'she asked you to teach her japanese.' }, // [VERIFY] timing
-        // User knew less English; other person fluent — became light teasing. (§3)
+        // User knew less English; other person fluent. (§3)
         { word: 'english', note: 'you knew less; she was fluent.' }, // [VERIFY] phrasing
       ],
     },

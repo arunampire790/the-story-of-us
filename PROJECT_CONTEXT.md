@@ -33,8 +33,6 @@
 - The two spoke in a mix of English and Tamil.
 - **"thambi"** (term of address used by one person toward the other) / **"akka"** (term of address used by the other toward them) formed an asymmetric, affectionate pattern of address.
 - **"vanga"** and **"ponga"** — both are Tamil-ish verbs meaning "come" (roughly "come here" / directional variants). Used as a recurring verbal motif. Exact usage context `[VERIFY]`.
-- The other person **repeatedly called the user "thambi"**.
-- During light flirting the user **jokingly threatened/teased that the other person should call him "akka"**. `[VERIFY]` exact phrasing.
 - The user knew **less English** while the other person spoke English fluently, a difference that became **light teasing**. `[VERIFY]` exact phrasing.
 
 ---

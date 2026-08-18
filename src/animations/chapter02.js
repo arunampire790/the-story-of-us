@@ -10,6 +10,10 @@ import gsap, { ScrollTrigger } from './setup'
 //   Beat 02 — The Signal: the HelloTalk connection is fragile ("often weak"),
 //     shown as the motif wrapper dimming/flickering on scroll.
 //   Beat 03 — In the Voice: restrained language fragments — gentle breathing.
+//     The thambi ↔ akka word pair is a visual relationship only (no speaker,
+//     event, or joke assigned); a subtle scrubbed focus shift moves the eye
+//     between the two words. vanga·ponga / 日本語 / english keep only their
+//     source-supported notes.
 //   Beat 04 — Continuing: quiet record lines; the motif steadies, then dims
 //     on exit as a breathing-space handoff for the next chapter.
 //
@@ -165,6 +169,12 @@ export function createVoiceIntimacyEntrance(scope, { reduced = false } = {}) {
       0,
     )
     .fromTo(
+      '[data-ch02voice="pair"]',
+      { opacity: 0, y: 12 },
+      { opacity: 1, y: 0, duration: reduced ? 0 : 0.6 },
+      reduced ? 0 : 0.2,
+    )
+    .fromTo(
       '[data-ch02voice="fragment"]',
       { opacity: 0, y: 10 },
       { opacity: 1, y: 0, duration: reduced ? 0 : 0.5, stagger: reduced ? 0 : 0.12 },
@@ -188,13 +198,40 @@ export function createVoiceIntimacyEntrance(scope, { reduced = false } = {}) {
   return timeline
 }
 
-// Beat 03 — gentle "voice" breathing: slow wrapper scale on the motif.
+// Beat 03 — gentle "voice" breathing: slow wrapper scale on the motif, plus a
+// subtle reciprocal focus shift between the thambi / akka word pair. The pair
+// tweens only move opacity/scale (local foreground transforms); they assign no
+// meaning — the eye just drifts between the two words across the scroll.
 export function createVoiceIntimacyChoreography(scope, { reduced = false } = {}) {
   const timeline = gsap.timeline({ defaults: { ease: 'none' }, scope })
 
   timeline
     .fromTo('[data-ch02voice="content"]', { y: 0 }, { y: -18, duration: 1 }, 0)
     .fromTo('[data-ch02voice="motif"]', { scale: 1 }, { scale: 1.035, duration: 1 }, 0)
+    .fromTo(
+      '[data-pair-word="thambi"]',
+      { opacity: 0.72, scale: 1 },
+      { opacity: 0.6, scale: 0.97, duration: 0.6 },
+      0,
+    )
+    .fromTo(
+      '[data-pair-word="akka"]',
+      { opacity: 0.72, scale: 1 },
+      { opacity: 0.84, scale: 1.02, duration: 0.6 },
+      0,
+    )
+    .fromTo(
+      '[data-pair-word="thambi"]',
+      { opacity: 0.6, scale: 0.97 },
+      { opacity: 0.7, scale: 0.995, duration: 0.4 },
+      0.6,
+    )
+    .fromTo(
+      '[data-pair-word="akka"]',
+      { opacity: 0.84, scale: 1.02 },
+      { opacity: 0.74, scale: 1.005, duration: 0.4 },
+      0.6,
+    )
 
   if (!reduced) {
     ScrollTrigger.create({

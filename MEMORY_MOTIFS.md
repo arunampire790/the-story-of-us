@@ -53,7 +53,6 @@ Recurring references that only the two of them would fully decode.
 
 - Coding / teaching-coding as the origin (HelloTalk, beginners' C).
 - The business of the two of them speaking "fast" / being mistaken for something else (per the police-officer quote). `[VERIFY]` whether this belongs here vs. a specific moment.
-- The "akka" flip: during light flirting the user jokingly demanded she call him "akka". `[VERIFY]` phrasing.
 - The mother-flirt joke: "unga paiyan ponnunga kitta poi flirt pannitu irukan." `[VERIFY]` spelling if displayed verbatim.
 
 ---
