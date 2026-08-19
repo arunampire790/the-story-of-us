@@ -23,8 +23,13 @@ import { createDistanceTimeline } from '../animations/chapter07'
 // opacity/transform only, reduced motion collapses to a simple cross-fade.
 // No sticky stage — the distance is literal, not pinned.
 
+// The three lines are the ONLY content that is width-constrained (max-w-3xl,
+// centred, padded). The decorative scene layers sit directly in a full-width
+// container so the orbs/grid/track span the whole viewport and never clip at
+// a narrow rectangular boundary.
+
 const LINE =
-  'relative z-10 text-center font-display text-[clamp(1.4rem,4.8vw,2.9rem)] font-light leading-snug tracking-wide text-text'
+  'relative z-10 mx-auto max-w-3xl px-6 text-center font-display text-[clamp(1.4rem,4.8vw,2.9rem)] font-light leading-snug tracking-wide text-text'
 
 export default function Chapter07() {
   const rootRef = useRef(null)
@@ -61,11 +66,12 @@ export default function Chapter07() {
       />
 
       {/* narrative flow — tall vertical padding makes the distance literal.
-          data-dst="content" is the host the exit scrub fades as a whole (its
-          children own their own reveals), so nothing fights for the same
-          property. */}
-      <div data-dst="content" className="relative z-10 mx-auto max-w-3xl px-6">
-        <div className="relative flex h-[52svh] items-center justify-center">
+          Full width and transparent: decorative scenes live here and must span
+          the whole viewport (never a max-width box). data-dst="content" is the
+          host the exit scrub fades as a whole (its children own their own
+          reveals), so nothing fights for the same property. */}
+      <div data-dst="content" className="relative z-10 w-full">
+        <div className="relative flex h-[52svh] w-full items-center justify-center">
           {/* decorative scene: two close memory nodes — subtle proximity */}
           <div data-dst="scene-1" aria-hidden="true" className="memory-scene">
             <span className="memory-node-slot">
@@ -80,7 +86,7 @@ export default function Chapter07() {
           </p>
         </div>
 
-        <div className="relative flex h-[52svh] items-center justify-center">
+        <div className="relative flex h-[52svh] w-full items-center justify-center">
           {/* decorative scene: nodes drift apart over the ambient grid/horizon */}
           <div data-dst="scene-2" aria-hidden="true" className="memory-scene">
             <div data-dst="grid-2" className="horizon-grid" />
@@ -97,7 +103,7 @@ export default function Chapter07() {
           </p>
         </div>
 
-        <div className="relative flex h-[52svh] items-center justify-center">
+        <div className="relative flex h-[52svh] w-full items-center justify-center">
           {/* decorative scene: grid/horizon converges into the vertical track */}
           <div data-dst="scene-3" aria-hidden="true" className="memory-scene">
             <div data-dst="grid-3" className="horizon-grid" />
@@ -116,7 +122,7 @@ export default function Chapter07() {
         </div>
 
         {/* guide — draws down toward the Train Journey (Chapter 08) */}
-        <div className="flex h-[24svh] items-start justify-center" aria-hidden="true">
+        <div className="flex h-[24svh] w-full items-start justify-center" aria-hidden="true">
           <span
             data-dst="guide"
             className="block w-px"
@@ -132,7 +138,7 @@ export default function Chapter07() {
         {/* trailing runout — the exit dissolve needs real scroll distance to
             scrub smoothly, so this is tall: the chapter closes on pure base
             dark before the section's bottom edge is reached. */}
-        <div className="min-h-[120svh]" aria-hidden="true" />
+        <div className="min-h-[120svh] w-full" aria-hidden="true" />
       </div>
 
       <div aria-hidden="true" className="edge-fade edge-fade-bottom" />
