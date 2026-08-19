@@ -8,6 +8,7 @@ import Chapter03 from './sections/Chapter03'
 import Chapter04 from './sections/Chapter04'
 import Chapter05 from './sections/Chapter05'
 import Chapter06 from './sections/Chapter06'
+import Chapter07 from './sections/Chapter07'
 import { useSmoothScroll } from './hooks/useSmoothScroll'
 
 // ?lab=1 renders the dev-only DesignLab instead of the real experience.
@@ -36,6 +37,7 @@ function App() {
             <Chapter04 />
             <Chapter05 />
             <Chapter06 />
+            <Chapter07 />
           </>
         )}
       </main>
