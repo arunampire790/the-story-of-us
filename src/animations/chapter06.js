@@ -1,98 +1,141 @@
 import gsap, { ScrollTrigger } from './setup'
 
-// Chapter 06 — Confession. "INSCRIPTION" (locked, stripped-down).
+// Chapter 06 — Confession. "THE HELD LINE" (state-driven presence-only hold).
 //
-// Words have been spoken -> the space holds them -> prolonged silence -> the
-// scene releases quietly into Distance. One scrubbed timeline drives the beats
-// on persistent layers (ConfessionField) plus the two real-text confession
-// lines (ConfessionLine). Opacity only; no layout animation, no RAF, no
-// particles, no continuous grain animation.
+// Replaces the former scroll-scrub with a single, persistent interaction:
+// the user presses and holds the dark field and the environment grows heavier
+// while the two real confession fragments stay present. Releasing early returns
+// to a quiet idle. Holding through the whole silence is the only completion —
+// at which point BOTH fragments recede together into unresolved dark.
 //
-//   0–6    OPENING / HANDOFF — hold the cool near-black field continuous with
-//                              Chapter 05's void. No new element, no cut.
-//   6–18   FIRST CONFESSION  — frag-1 "en heart beat fast agudhu" rises as a
-//                              whole line (no typing, no movement).
-//   18–28  HOLD              — frag-1 stays completely unchanged; no activity.
-//   28–40  SECOND CONFESSION — frag-2 "oruvela idhu love ah irukumo" rises as
-//                              a whole line. Both now visible together.
-//   40–88  SILENCE (~150vh)  — BOTH lines completely static. ONLY the
-//                              environment pressurizes: grain 0->0.55 and
-//                              vignette/depth (press) 0->0.26. No timer, no
-//                              progress, no scroll resistance.
-//   88–96  RELEASE           — both fragments gradually recede together into
-//                              near-black (not sequentially); env settles.
-//   96–100 CH07 HANDOFF      — sparse near-black; no symbolic object remains.
+//   Chapter 03 = REMEMBER   (produce knowledge -> unlock)
+//   Chapter 06 = STAY       (endure presence -> remain)
 //
-// All motion is opacity only (whole-line reveals use a restrained power1.out;
-// the release drain uses power1.in; the scrub drive is linear). No pin, no
-// wheel/touch handlers, no scrollerProxy, no loops, no time-based animation.
-// Reverse scroll reverses the inscription naturally.
+// THIS FILE CARRIES NO STORY TEXT. It only drives opacity on nodes the
+// components expose (data-conf). Opacity-only, no layout/transform/RAF, no
+// loops. The recollect hold length is owned by the section, not this file; here
+// we expose the visual state transitions (entry / held / idle / carry).
+//
+// Entry is triggered once when the section scrolls into view (the fragments
+// resolve from darkness). Reduced motion collapses to a static, present,
+// settled state with an instant single-step carry — no long interaction
+// timeline.
+//
+// State transitions are plain one-shot tweens: every transition first kills
+// any in-flight tween on the properties it owns, so release / re-hold / carry
+// can never fight a running heaviness ramp and always take over cleanly.
 
-const S = (key) => `[data-conf="${key}"]`
+const HEAVY_IN = 'power1.in' // heaviness mounts slowly, then presses harder
+const RELAX_OUT = 'power2.out' // settling back down feels weightless
+const RECEDE_IN = 'power1.in' // the fragments sink away rather than pop
 
-export function createConfessionTimeline(scope, { reduced = false } = {}) {
-  const field = S('field')
-  const frag1 = S('frag-1')
-  const frag2 = S('frag-2')
-  const press = S('press')
-  const grain = S('grain')
+export function createHeldLineController(scope, { reduced = false } = {}) {
+  const frag1 = scope.querySelector('[data-conf="frag-1"]')
+  const frag2 = scope.querySelector('[data-conf="frag-2"]')
+  const field = scope.querySelector('[data-conf="field"]')
+  const press = scope.querySelector('[data-conf="press"]')
+  const grain = scope.querySelector('[data-conf="grain"]')
+  const thread = scope.querySelector('[data-conf="thread"]')
 
-  // State 00 — OPENING: continuous with Chapter 05's near-black holding field.
+  if (!frag1 || !frag2 || !field || !press || !grain || !thread) return null
+
+  // Normal interaction path opens on the approved cool confession field (0.9),
+  // matching the reduced-motion static state and the previous INSCRIPTION
+  // design. The heaviness (press/grain) and thread start quiet at 0.
   gsap.set(field, { opacity: 0.9 })
-  gsap.set(frag1, { opacity: 0 })
-  gsap.set(frag2, { opacity: 0 })
-  gsap.set(press, { opacity: 0 })
-  gsap.set(grain, { opacity: 0 })
+  gsap.set([press, grain, thread], { opacity: 0 })
+  gsap.set([frag1, frag2], { opacity: 0 })
 
+  const targets = { frag1, frag2, field, press, grain, thread }
+
+  // REDUCED MOTION — meaningful settled, present state. A single instant
+  // presence step performs the recession. No long interaction timeline.
   if (reduced) {
-    // Meaningful settled state: both confession lines at rest over the cool
-    // field, with a restrained vignette + grain. Static only — no ScrollTrigger,
-    // no animation, no loop.
     gsap.set(field, { opacity: 0.9 })
-    gsap.set(frag1, { opacity: 0.92 })
-    gsap.set(frag2, { opacity: 0.92 })
     gsap.set(press, { opacity: 0.26 })
     gsap.set(grain, { opacity: 0.55 })
-    return null
+    gsap.set(frag1, { opacity: 0.92 })
+    gsap.set(frag2, { opacity: 0.92 })
+
+    return {
+      reduced: true,
+      begin() {},
+      release() {},
+      carry() {
+        gsap.to(frag1, { opacity: 0, duration: 0.5, ease: 'power1.in' })
+        gsap.to(frag2, { opacity: 0, duration: 0.5, ease: 'power1.in' })
+        gsap.to([press], { opacity: 0.2, duration: 0.4, ease: 'power1.out' })
+        gsap.to([grain], { opacity: 0.3, duration: 0.4, ease: 'power1.out' })
+      },
+      kill() {
+        Object.values(targets).forEach((t) => gsap.killTweensOf(t))
+      },
+    }
   }
 
-  const t = gsap.timeline({ defaults: { ease: 'none' }, paused: true })
+  // ENTRY — fragments resolve from darkness (sequential in), then the thread
+  // pretaste appears once both are at rest.
+  const entryTl = gsap.timeline({ paused: true, defaults: { ease: 'power1.out' } })
+  entryTl
+    .to(frag1, { opacity: 0.92, duration: 2.2 }, 0)
+    .to(frag2, { opacity: 0.92, duration: 2.2 }, 1.4)
+    .to(thread, { opacity: 0.16, duration: 2.4 }, 2.8)
 
-  // 0–6 HANDOFF — field held; no new element.
+  // HELD — the field grows heavier (grain/vignette rise), the thread goes taut.
+  // The only feedback is growing weight; there is no progress, no meter.
+  const begin = () => {
+    gsap.killTweensOf([press, grain, thread])
+    gsap.to(press, { opacity: 0.26, duration: 3.5, ease: HEAVY_IN })
+    gsap.to(grain, { opacity: 0.55, duration: 3.5, ease: HEAVY_IN })
+    gsap.to(thread, { opacity: 0.34, duration: 0.6, ease: RELAX_OUT })
+  }
 
-  // BEAT 01 — FIRST CONFESSION (6–18): frag-1 whole-line rise to 0.92.
-  t.to(frag1, { opacity: 0.92, duration: 12, ease: 'power1.out' }, 6)
+  // IDLE — releasing early settles the heaviness back down; fragments stay.
+  const release = () => {
+    gsap.killTweensOf([press, grain, thread])
+    gsap.to(press, { opacity: 0, duration: 1.4, ease: RELAX_OUT })
+    gsap.to(grain, { opacity: 0, duration: 1.4, ease: RELAX_OUT })
+    gsap.to(thread, { opacity: 0.16, duration: 1.0, ease: RELAX_OUT })
+  }
 
-  // 18–28 HOLD — frag-1 stays at 0.92; no environmental change.
+  // CARRY — completion: BOTH fragments recede together; the field settles and
+  // the thread relents. Nothing is resolved, nothing answered.
+  const carry = () => {
+    gsap.killTweensOf([frag1, frag2, press, grain, thread])
+    gsap.to(frag1, { opacity: 0, duration: 3, ease: RECEDE_IN })
+    gsap.to(frag2, { opacity: 0, duration: 3, ease: RECEDE_IN })
+    gsap.to(press, { opacity: 0.08, duration: 1.2, ease: RELAX_OUT })
+    gsap.to(grain, { opacity: 0.18, duration: 1.0, ease: RELAX_OUT })
+    gsap.to(thread, { opacity: 0, duration: 1.0, ease: RELAX_OUT })
+  }
 
-  // BEAT 02 — SECOND CONFESSION (28–40): frag-2 whole-line rise to 0.92.
-  t.to(frag2, { opacity: 0.92, duration: 12, ease: 'power1.out' }, 28)
+  let entryStarted = false
+  const startEntry = () => {
+    if (entryStarted) return
+    entryStarted = true
+    entryTl.play()
+  }
 
-  // BEAT 03 — SILENCE (40–88, ~144svh): both lines static; environment only.
-  // The atmosphere pressurizes through restrained vignette/depth and grain.
-  // No timer, no progress, no scroll resistance.
-  t.to(press, { opacity: 0.26, duration: 48, ease: 'power1.out' }, 40).to(
-    grain,
-    { opacity: 0.55, duration: 48, ease: 'power1.out' },
-    40,
-  )
-
-  // BEAT 04 — RELEASE (88–96): both fragments recede together into near-black,
-  // quietly and unresolved; the environment settles.
-  t.to(frag1, { opacity: 0, duration: 8, ease: 'power1.in' }, 88)
-    .to(frag2, { opacity: 0, duration: 8, ease: 'power1.in' }, 88)
-    .to(press, { opacity: 0.08, duration: 8, ease: 'power1.out' }, 88)
-    .to(grain, { opacity: 0.15, duration: 8, ease: 'power1.out' }, 88)
-
-  // 96–100 CH07 HANDOFF — sparse near-black holds (fragments already drained).
-
-  ScrollTrigger.create({
+  const entryTrigger = ScrollTrigger.create({
     trigger: scope,
-    start: 'top top',
-    end: 'bottom bottom',
-    scrub: 1,
-    animation: t,
+    start: 'top bottom',
+    once: true,
+    onEnter: () => {
+      startEntry()
+      entryTrigger.kill()
+    },
   })
 
-  return t
+  return {
+    reduced: false,
+    startEntry,
+    begin,
+    release,
+    carry,
+    kill() {
+      entryTl.kill()
+      entryTrigger.kill()
+      Object.values(targets).forEach((t) => gsap.killTweensOf(t))
+    },
+  }
 }

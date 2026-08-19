@@ -47,7 +47,8 @@ export default function ConfessionField() {
       />
 
       {/* grain — the approved static grain treatment, localized to this stage
-          so its presence can be scrubbed during the silence. Never animated. */}
+          so its presence can be intensified during the held silence. Never
+          animated on its own; its opacity is driven by the held-line controller. */}
       <div
         data-conf="grain"
         className="absolute inset-0"
@@ -57,6 +58,36 @@ export default function ConfessionField() {
           backgroundSize: '220px 220px',
           backgroundRepeat: 'repeat',
           mixBlendMode: 'overlay',
+        }}
+      />
+
+      {/* THE HELD LINE affordance — a barely-visible cool, neutral vertical
+          thread at the center. It pretastes the hold after the fragments come
+          to rest and goes taut only while held. Decorative; opacity is driven
+          by the held-line controller. Not a progress indicator. */}
+      <div
+        data-conf="thread"
+        className="absolute left-1/2 top-[30%] bottom-[30%] w-px -translate-x-1/2"
+        style={{
+          opacity: 0,
+          background:
+            'linear-gradient(180deg, transparent 0%, rgba(168,186,208,0.30) 50%, transparent 100%)',
+        }}
+      />
+
+      {/* pointer pooling — an extremely subtle cool radial that gathers toward
+          the pointer, suggesting the dark is responsive to the hand. Not a
+          rectangle, not a glow, not a hover cue with meaning. Position is
+          updated by the section on pointer move; opacity only. */}
+      <div
+        data-conf="pool"
+        className="pointer-events-none absolute left-0 top-0 rounded-full"
+        style={{
+          opacity: 0,
+          width: '100vmax',
+          height: '100vmax',
+          background:
+            'radial-gradient(circle, rgba(32,40,50,0.34) 0%, rgba(16,20,26,0.12) 45%, transparent 70%)',
         }}
       />
     </div>
