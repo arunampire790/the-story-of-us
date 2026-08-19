@@ -151,6 +151,7 @@ export default function Chapter03() {
 
   return (
     <section id="chapter-03" data-anchor="the-lock" ref={rootRef} className="relative w-full">
+      <div aria-hidden="true" className="edge-fade edge-fade-top" />
       {/* sticky stage — the memory lock (decorative field + interactive copy).
           The release tween animates the lock/frame wrappers inside the copy,
           not this stage, so the opening scrub and the zoom-out never conflict. */}
@@ -169,6 +170,7 @@ export default function Chapter03() {
           once solved the user simply continues scrolling it and into Chapter
           04. */}
       <div className="pointer-events-none relative z-10 min-h-[120svh]" aria-hidden="true" />
+      <div aria-hidden="true" className="edge-fade edge-fade-bottom" />
     </section>
   )
 }

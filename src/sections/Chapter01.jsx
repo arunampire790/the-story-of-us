@@ -14,9 +14,11 @@ export default function Chapter01() {
 
   return (
     <CinematicSection id={meta.id} anchor={meta.anchor} width="cinematic">
+      <div aria-hidden="true" className="edge-fade edge-fade-top" />
       <Beat01TheRoom data={beats.beat01} />
       <Beat02TheEntry data={beats.beat02} />
       <Chapter01Closing />
+      <div aria-hidden="true" className="edge-fade edge-fade-bottom" />
     </CinematicSection>
   )
 }

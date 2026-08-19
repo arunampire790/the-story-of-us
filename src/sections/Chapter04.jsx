@@ -31,6 +31,7 @@ export default function Chapter04() {
 
   return (
     <section id="chapter-04" data-anchor="calls" ref={rootRef} className="relative w-full">
+      <div aria-hidden="true" className="edge-fade edge-fade-top" />
       {/* sticky stage — the persistent room + narrative copy */}
       <div className="sticky top-0 z-0 h-[100svh] w-full overflow-x-clip">
         <RoomsField />
@@ -39,6 +40,7 @@ export default function Chapter04() {
 
       {/* runway — scroll distance that drives the states via scrub */}
       <div className="relative z-10 min-h-[360svh]" aria-hidden="true" />
+      <div aria-hidden="true" className="edge-fade edge-fade-bottom" />
     </section>
   )
 }

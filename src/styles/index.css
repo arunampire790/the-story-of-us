@@ -304,6 +304,138 @@
 /* Minimal, on-theme focus treatment for the integrated chamber/control. */
 
 /* ---------------------------------------------------------------------------
+   CHAPTER EDGE FADES — seamless chapter transitions.
+   Thin bands at the top and bottom of each chapter section that blend any
+   local atmosphere back to the global base colour, so scrolling between
+   chapters has no hard horizontal seam. Pure base-colour gradients,
+   pointer-events none, aria-hidden expected from the markup.
+-------------------------------------------------------------------------- */
+
+.edge-fade {
+  position: absolute;
+  left: 50%;
+  width: 100vw;
+  height: 14svh;
+  pointer-events: none;
+  z-index: 5;
+  transform: translateX(-50%);
+}
+
+.edge-fade-top {
+  top: 0;
+  background: linear-gradient(180deg, var(--color-bg) 0%, transparent 100%);
+}
+
+.edge-fade-bottom {
+  bottom: 0;
+  background: linear-gradient(0deg, var(--color-bg) 0%, transparent 100%);
+}
+
+/* ---------------------------------------------------------------------------
+   CHAPTER 07 — DISTANCE. DUAL MEMORY NODES + AMBIENT HORIZON SCENE.
+   Two soft glowing memory orbs (her / him) sit in subtle proximity behind the
+   first line, drift apart over a faint ruled grid + horizon glow behind the
+   second, then converge into a single vertical track behind the third — the
+   track carries the eye down toward the Train Journey. GPU-friendly: the
+   animations drive opacity / scale / translate3d only. The orbs are centered
+   by a flex slot so GSAP fully owns their transform.
+-------------------------------------------------------------------------- */
+
+.memory-scene {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+}
+
+.memory-node-slot {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.memory-node {
+  width: clamp(64px, 18vw, 120px);
+  height: clamp(64px, 18vw, 120px);
+  border-radius: 9999px;
+  will-change: transform, opacity;
+}
+
+.memory-node-cool {
+  background: radial-gradient(
+    circle,
+    rgba(152, 192, 222, 0.85) 0%,
+    rgba(96, 140, 180, 0.28) 46%,
+    rgba(96, 140, 180, 0) 72%
+  );
+  box-shadow: 0 0 72px 18px rgba(122, 172, 216, 0.16);
+}
+
+.memory-node-warm {
+  background: radial-gradient(
+    circle,
+    rgba(240, 198, 148, 0.85) 0%,
+    rgba(202, 150, 94, 0.28) 46%,
+    rgba(202, 150, 94, 0) 72%
+  );
+  box-shadow: 0 0 72px 18px rgba(216, 166, 112, 0.16);
+}
+
+.horizon-grid {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    180deg,
+    transparent 0 16px,
+    rgba(138, 160, 184, 0.09) 16px 17px
+  );
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.75) 40%,
+    rgba(0, 0, 0, 0.75) 60%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.75) 40%,
+    rgba(0, 0, 0, 0.75) 60%,
+    transparent 100%
+  );
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+}
+
+.horizon-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 62% 36% at 50% 50%,
+    rgba(138, 160, 184, 0.16) 0%,
+    rgba(138, 160, 184, 0) 70%
+  );
+  will-change: opacity;
+}
+
+.track-line {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1px;
+  height: 44svh;
+  margin-left: -0.5px;
+  background: linear-gradient(
+    180deg,
+    rgba(138, 160, 184, 0.55) 0%,
+    rgba(138, 160, 184, 0) 92%
+  );
+  transform-origin: 50% 0;
+  will-change: transform, opacity;
+}
+
+/* ---------------------------------------------------------------------------
    REDUCED MOTION
    Collapse atmosphere + signal effects so the foundation stays usable.
 -------------------------------------------------------------------------- */
@@ -336,5 +468,14 @@
     /* Reduced motion: no shake, no dial rotation, no floating, no transition-
        dependent information. The lock remains fully usable. */
     transition: none;
+  }
+
+  .memory-node,
+  .horizon-grid,
+  .horizon-glow,
+  .track-line {
+    /* The JS reduced path already fixes calm resting states; just drop the
+       hint so nothing keeps a compositor hint running. */
+    will-change: auto;
   }
 }

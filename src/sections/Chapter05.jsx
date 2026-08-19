@@ -34,6 +34,7 @@ export default function Chapter05() {
 
   return (
     <section id="chapter-05" data-anchor="silence" ref={rootRef} className="relative w-full">
+      <div aria-hidden="true" className="edge-fade edge-fade-top" />
       {/* sticky stage — the persistent cooling field + chapter label */}
       <div className="sticky top-0 z-0 h-[100svh] w-full overflow-x-clip">
         <SilenceField />
@@ -42,6 +43,7 @@ export default function Chapter05() {
 
       {/* runway — scroll distance that drives the cooling via scrub */}
       <div className="relative z-10 min-h-[300svh]" aria-hidden="true" />
+      <div aria-hidden="true" className="edge-fade edge-fade-bottom" />
     </section>
   )
 }
