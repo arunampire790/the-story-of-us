@@ -20,9 +20,15 @@ import gsap, { ScrollTrigger } from './setup'
 //            draws downward, handing the eye to the guide toward Chapter 08.
 // These scene tweens are opacity/scale/translate only (GPU-friendly).
 //
+// At the very end, after the track has converged and the guide has finished
+// drawing, the whole chapter dissolves: the content host (all lines, scenes,
+// guide) and the cool wash scrub to opacity 0 over the tall trailing runout,
+// closing on pure base dark before the section's bottom edge.
+//
 // Reduced motion collapses everything to a simple cross-fade: each line (and
 // the guide) fades to its resting opacity once, with no spatial drift and no
-// scrub, and the scenes sit in calm, gentle resting states.
+// scrub, the scenes sit in calm, gentle resting states, and the end dissolve
+// becomes a single gentle opacity fade driven by position.
 
 const S = (key) => `[data-dst="${key}"]`
 
@@ -52,6 +58,14 @@ export function createDistanceTimeline(scope, { reduced = false } = {}) {
   const scene1 = [nodes.a1, nodes.b1].every(Boolean)
   const scene2 = [grid2, glow2, nodes.a2, nodes.b2].every(Boolean)
   const scene3 = [grid3, glow3, track3, nodes.a3, nodes.b3].every(Boolean)
+
+  // Exit dissolve targets. The content wrapper hosts all lines, scenes and the
+  // guide (each child owns its own reveal/transform), and the wash is the cool
+  // backdrop — so fading these two parents fades the ENTIRE chapter to pure
+  // base dark with no two tweens fighting for the same opacity property.
+  const wash = node('wash')
+  const content = node('content')
+  const exitTargets = [content, wash].filter(Boolean)
 
   gsap.set([line1, line2, line3], { opacity: 0, y: 48 })
   gsap.set(guide, { opacity: 0, scaleY: 0 })
@@ -93,7 +107,29 @@ export function createDistanceTimeline(scope, { reduced = false } = {}) {
       .to(line2, { opacity: 0.95 }, '+=0.2')
       .to(line3, { opacity: 0.95 }, '+=0.2')
       .to(guide, { opacity: 0.5, scaleY: 1 }, '+=0.2')
-    return () => tl.kill()
+
+    // Reduced motion keeps the same end dissolve as a single gentle opacity
+    // fade driven by position (no scrub, no drift) — when the guide passes the
+    // upper viewport the chapter eases to base dark, and it returns if the
+    // reader scrolls back. Clean resting states on both sides of the fade.
+    const exitFade = gsap.to(exitTargets, {
+      opacity: 0,
+      ease: 'power1.inOut',
+      duration: 1.2,
+      paused: true,
+    })
+    const tExit = ScrollTrigger.create({
+      trigger: guide,
+      start: 'top 25%',
+      end: 'bottom top',
+      onEnter: () => exitFade.play(),
+      onLeaveBack: () => exitFade.reverse(),
+    })
+    return () => {
+      tl.kill()
+      exitFade.kill()
+      tExit.kill()
+    }
   }
 
   const reveal = (el) =>
@@ -170,6 +206,23 @@ export function createDistanceTimeline(scope, { reduced = false } = {}) {
       })
     : null
 
+  // EXIT — the final dissolve. Once line 3 is fully revealed and the track has
+  // converged (i.e. the guide has finished drawing, trigger: guide start
+  // 'top 30%' exactly matches the guide scrub's end), the content host and the
+  // cool wash fade to opacity 0 as the tall trailing runout scrolls through.
+  // The end is tuned so the dissolve completes while the section bottom is
+  // still well below the viewport bottom, leaving a stretch of pure base dark
+  // shown before the section's bottom edge scrolls into view.
+  const tExit = exitTargets.length
+    ? ScrollTrigger.create({
+        trigger: guide,
+        start: 'top 30%',
+        end: 'top -22%',
+        scrub: 1,
+        animation: gsap.to(exitTargets, { opacity: 0, ease: 'none' }),
+      })
+    : null
+
   return () => {
     t1.kill()
     t2.kill()
@@ -178,5 +231,6 @@ export function createDistanceTimeline(scope, { reduced = false } = {}) {
     tScene1?.kill()
     tScene2?.kill()
     tScene3?.kill()
+    tExit?.kill()
   }
 }

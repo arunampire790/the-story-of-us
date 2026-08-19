@@ -47,8 +47,11 @@ export default function Chapter07() {
     >
       <div aria-hidden="true" className="edge-fade edge-fade-top" />
 
-      {/* cool dark slate wash — deep, cool, and continuous with the global base */}
+      {/* cool dark slate wash — deep, cool, and continuous with the global base.
+          data-dst="wash" lets the exit scrub dissolve it too, so the chapter
+          closes on pure base dark before the section's bottom edge. */}
       <div
+        data-dst="wash"
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
         style={{
@@ -57,8 +60,11 @@ export default function Chapter07() {
         }}
       />
 
-      {/* narrative flow — tall vertical padding makes the distance literal */}
-      <div className="relative z-10 mx-auto max-w-3xl px-6">
+      {/* narrative flow — tall vertical padding makes the distance literal.
+          data-dst="content" is the host the exit scrub fades as a whole (its
+          children own their own reveals), so nothing fights for the same
+          property. */}
+      <div data-dst="content" className="relative z-10 mx-auto max-w-3xl px-6">
         <div className="relative flex h-[52svh] items-center justify-center">
           {/* decorative scene: two close memory nodes — subtle proximity */}
           <div data-dst="scene-1" aria-hidden="true" className="memory-scene">
@@ -123,8 +129,10 @@ export default function Chapter07() {
           />
         </div>
 
-        {/* trailing runout — room for the guide to draw down fully toward Chapter 08 */}
-        <div className="min-h-[48svh]" aria-hidden="true" />
+        {/* trailing runout — the exit dissolve needs real scroll distance to
+            scrub smoothly, so this is tall: the chapter closes on pure base
+            dark before the section's bottom edge is reached. */}
+        <div className="min-h-[120svh]" aria-hidden="true" />
       </div>
 
       <div aria-hidden="true" className="edge-fade edge-fade-bottom" />
