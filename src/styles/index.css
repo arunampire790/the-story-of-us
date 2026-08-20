@@ -304,6 +304,22 @@
 /* Minimal, on-theme focus treatment for the integrated chamber/control. */
 
 /* ---------------------------------------------------------------------------
+   CHAPTER 01 — ENTRY SAFETY (initial-load fallback).
+   The Beat 01 hero mounts VISIBLE by default. On a cold first visit a stale
+   ScrollTrigger measurement must never be able to strand the page blank:
+   the entrance timeline's fromTo tweens use immediateRender:false, so they
+   hold these CSS defaults until the entrance actually fires. GSAP then fades
+   them in cleanly on page load — no scroll event or hard refresh required.
+-------------------------------------------------------------------------- */
+
+[data-beat01='metadata'],
+[data-beat01='title'],
+[data-beat01='memory'],
+[data-beat01='rings'] {
+  opacity: 1;
+}
+
+/* ---------------------------------------------------------------------------
    CHAPTER EDGE FADES — seamless chapter transitions.
    Thin bands at the top and bottom of each chapter section that blend any
    local atmosphere back to the global base colour, so scrolling between
@@ -467,6 +483,33 @@
 }
 
 /* ---------------------------------------------------------------------------
+   CHAPTER 08 — TRAIN JOURNEY. THE CONTINUOUS VISUAL SPINE.
+   The chapter rides the site's signature spine: a central railway track
+   (two thin SVG rails) continues the exact line Chapter 07 drew down (50%
+   centre), so the chapters flow with no seam. No fake window, no floating
+   card, no container box, no pitch-black void — the transparent sticky
+   viewport sits over the global atmospheric base with a faint centre glow.
+
+   Class map (GSAP selects these by data-train inside the section scope):
+     .ch08-rail-left/right  the two ultra-thin steel rails (pulse via GSAP)
+     .ch08-signal-amber     passing warm amber ambient glow (top-left)
+     .ch08-signal-indigo    passing deep indigo ambient glow (bottom-right)
+     .ch08-streak           horizontal speed streaks (absolute, so inline
+                            top/left/width position them across the stage)
+-------------------------------------------------------------------------- */
+
+.ch08-signal-amber,
+.ch08-signal-indigo {
+  will-change: transform, opacity;
+}
+
+.ch08-streak {
+  position: absolute;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* ---------------------------------------------------------------------------
    REDUCED MOTION
    Collapse atmosphere + signal effects so the foundation stays usable.
 -------------------------------------------------------------------------- */
@@ -507,6 +550,13 @@
   .track-line {
     /* The JS reduced path already fixes calm resting states; just drop the
        hint so nothing keeps a compositor hint running. */
+    will-change: auto;
+  }
+
+  .ch08-signal-amber,
+  .ch08-signal-indigo,
+  .ch08-streak {
+    /* Same — the JS reduced path sets fixed resting states. */
     will-change: auto;
   }
 }

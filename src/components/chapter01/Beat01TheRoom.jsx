@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import { useGSAP } from '@gsap/react'
+import { ScrollTrigger } from '../../animations/setup'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import {
   createRoomEntranceTimeline,
@@ -16,30 +17,47 @@ import SignalRings from './SignalRings'
 //   2. Subtle scrubbed parallax — gentle "breathing" tied to scroll.
 //   3. Beat 01 → Beat 02 decompression — Beat 01 recedes as it exits.
 // No pinning, no scene transitions, no scroll drivers.
+//
+// Initial-load guard: ScrollTrigger measures trigger positions at creation,
+// which on a cold first visit can happen before fonts/images/svh settle — the
+// entrance start would be wrong and the hero could stay hidden until a manual
+// reload. We re-measure on the next frame and again after the window 'load'
+// event so the first phrase reveals without a scroll event or refresh. The
+// entrance tweens also use immediateRender:false (see chapter01.js), so the
+// hero mounts visible by default and can never be stranded blank.
 export default function Beat01TheRoom({ data }) {
   const rootRef = useRef(null)
   const reduced = useReducedMotion()
 
   useGSAP(
     () => {
-      const timeline = createRoomEntranceTimeline(rootRef.current, { reduced })
-      return () => timeline.kill()
+      const entrance = createRoomEntranceTimeline(rootRef.current, { reduced })
+
+      const raf = requestAnimationFrame(() => ScrollTrigger.refresh())
+      const onLoad = () => ScrollTrigger.refresh()
+      window.addEventListener('load', onLoad)
+
+      return () => {
+        cancelAnimationFrame(raf)
+        window.removeEventListener('load', onLoad)
+        entrance.kill()
+      }
     },
     { scope: rootRef, dependencies: [reduced] },
   )
 
   useGSAP(
     () => {
-      const timeline = createRoomScrollChoreography(rootRef.current, { reduced })
-      return () => timeline.kill()
+      const parallax = createRoomScrollChoreography(rootRef.current, { reduced })
+      return () => parallax.kill()
     },
     { scope: rootRef, dependencies: [reduced] },
   )
 
   useGSAP(
     () => {
-      const timeline = createRoomToEntryTransition(rootRef.current, { reduced })
-      return () => timeline.kill()
+      const transition = createRoomToEntryTransition(rootRef.current, { reduced })
+      return () => transition.kill()
     },
     { scope: rootRef, dependencies: [reduced] },
   )

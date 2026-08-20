@@ -31,20 +31,20 @@ export default function Beat02TheEntry({ data }) {
         button: '[data-beat02="button"]',
       }
 
-      // Explicit hidden start state so nothing shows before the trigger fires.
-      gsap.set(targets.meta, { opacity: 0, y: 10 })
-      gsap.set(targets.heading, { opacity: 0, y: 14 })
-      gsap.set(targets.body, { opacity: 0, y: 14 })
-      gsap.set(targets.button, { opacity: 0, y: 10 })
-
+      // fromTo + immediateRender:false (never force-hidden at mount) — the card
+      // mounts visible by default and fades in only when the trigger fires, so
+      // a stale first measurement can't leave this section blank until reload.
       const entrance = gsap
-        .timeline({ defaults: { ease: 'power2.out' }, paused: true })
-        .to(targets.meta, { opacity: 1, y: 0, duration: reduced ? 0 : 0.6 }, 0)
-        .to(targets.heading, { opacity: 1, y: 0, duration: reduced ? 0 : 0.7 }, reduced ? 0 : 0.25)
-        .to(targets.body, { opacity: 1, y: 0, duration: reduced ? 0 : 0.7 }, reduced ? 0 : 0.5)
-        .to(targets.button, { opacity: 1, y: 0, duration: reduced ? 0 : 0.6 }, reduced ? 0 : 0.7)
+        .timeline({
+          defaults: { ease: 'power2.out', immediateRender: false },
+          paused: true,
+        })
+        .fromTo(targets.meta, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: reduced ? 0 : 0.6 }, 0)
+        .fromTo(targets.heading, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: reduced ? 0 : 0.7 }, reduced ? 0 : 0.25)
+        .fromTo(targets.body, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: reduced ? 0 : 0.7 }, reduced ? 0 : 0.5)
+        .fromTo(targets.button, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: reduced ? 0 : 0.6 }, reduced ? 0 : 0.7)
 
-      ScrollTrigger.create({
+      const trigger = ScrollTrigger.create({
         trigger: rootRef.current,
         start: 'top 70%',
         toggleActions: 'play none none none',
@@ -52,7 +52,10 @@ export default function Beat02TheEntry({ data }) {
         animation: entrance,
       })
 
-      return () => entrance.kill()
+      return () => {
+        entrance.kill()
+        trigger.kill()
+      }
     },
     { scope: rootRef, dependencies: [reduced] },
   )
@@ -114,7 +117,7 @@ useGSAP(
 
       if (reduced) return () => parallax.kill()
 
-      ScrollTrigger.create({
+      const trigger = ScrollTrigger.create({
         trigger: rootRef.current,
         start: 'top 85%',
         end: 'bottom 45%',
@@ -122,7 +125,10 @@ useGSAP(
         animation: parallax,
       })
 
-      return () => parallax.kill()
+      return () => {
+        parallax.kill()
+        trigger.kill()
+      }
     },
     { scope: rootRef, dependencies: [reduced] },
   )

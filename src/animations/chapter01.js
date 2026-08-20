@@ -14,10 +14,17 @@ import gsap, { ScrollTrigger } from './setup'
 //
 // Animation ownership: GSAP never touches the CSS-owned opacity/scale pulse
 // on the ring circles — it only transforms the rings WRAPPER.
+//
+// Initial-load safety: every fromTo uses immediateRender:false, so on mount
+// NOTHING is force-hidden inline. The hero mounts visibly by default (CSS
+// fallback) and only the entrance ScrollTrigger fades it in once it fires —
+// a stale first measurement can no longer strand the chapter blank/dark
+// until a manual reload. Each factory returns a `kill()` that tears down the
+// timeline AND its ScrollTrigger (StrictMode double-mount safe).
 
 export function createRoomEntranceTimeline(scope, { reduced = false } = {}) {
   const timeline = gsap.timeline({
-    defaults: { ease: 'power2.out' },
+    defaults: { ease: 'power2.out', immediateRender: false },
     scope,
     paused: true,
     delay: reduced ? 0 : 0.2,
@@ -49,7 +56,7 @@ export function createRoomEntranceTimeline(scope, { reduced = false } = {}) {
       reduced ? 0 : 1.05,
     )
 
-  ScrollTrigger.create({
+  const trigger = ScrollTrigger.create({
     trigger: scope,
     start: 'top 80%',
     toggleActions: 'play none none none',
@@ -57,7 +64,13 @@ export function createRoomEntranceTimeline(scope, { reduced = false } = {}) {
     animation: timeline,
   })
 
-  return timeline
+  return {
+    timeline,
+    kill() {
+      timeline.kill()
+      trigger.kill()
+    },
+  }
 }
 
 // Phase 5B — subtle, scrubbed parallax while Beat 01 is in view.
@@ -65,7 +78,10 @@ export function createRoomEntranceTimeline(scope, { reduced = false } = {}) {
 // Continuous ring opacity stays owned by the CSS pulse.
 // Reduced motion: no scroll choreography (timeline created, never run).
 export function createRoomScrollChoreography(scope, { reduced = false } = {}) {
-  const timeline = gsap.timeline({ defaults: { ease: 'none' }, scope })
+  const timeline = gsap.timeline({
+    defaults: { ease: 'none', immediateRender: false },
+    scope,
+  })
 
   timeline
     .fromTo(
@@ -94,16 +110,29 @@ export function createRoomScrollChoreography(scope, { reduced = false } = {}) {
     )
 
   if (!reduced) {
-    ScrollTrigger.create({
+    const trigger = ScrollTrigger.create({
       trigger: scope,
       start: 'top 60%',
       end: 'top -20%',
       scrub: 0.6,
       animation: timeline,
     })
+
+    return {
+      timeline,
+      kill() {
+        timeline.kill()
+        trigger.kill()
+      },
+    }
   }
 
-  return timeline
+  return {
+    timeline,
+    kill() {
+      timeline.kill()
+    },
+  }
 }
 
 // Phase 5C — Beat 01 → Beat 02 transition. One memory → the next.
@@ -113,7 +142,10 @@ export function createRoomScrollChoreography(scope, { reduced = false } = {}) {
 // of the frame as Beat 02's content emerges below. No pin, no scroll hijack.
 // Reduced motion: no transition (timeline created, never run).
 export function createRoomToEntryTransition(scope, { reduced = false } = {}) {
-  const timeline = gsap.timeline({ defaults: { ease: 'none' }, scope })
+  const timeline = gsap.timeline({
+    defaults: { ease: 'none', immediateRender: false },
+    scope,
+  })
 
   timeline
     .fromTo(
@@ -142,14 +174,27 @@ export function createRoomToEntryTransition(scope, { reduced = false } = {}) {
     )
 
   if (!reduced) {
-    ScrollTrigger.create({
+    const trigger = ScrollTrigger.create({
       trigger: scope,
       start: 'top -20%',
       end: 'top -100%',
       scrub: 0.7,
       animation: timeline,
     })
+
+    return {
+      timeline,
+      kill() {
+        timeline.kill()
+        trigger.kill()
+      },
+    }
   }
 
-  return timeline
+  return {
+    timeline,
+    kill() {
+      timeline.kill()
+    },
+  }
 }

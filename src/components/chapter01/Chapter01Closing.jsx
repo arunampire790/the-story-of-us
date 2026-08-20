@@ -25,13 +25,11 @@ export default function Chapter01Closing() {
         return
       }
 
-      gsap.set(target, { opacity: 0, scale: 0.92 })
-
       const timeline = gsap
-        .timeline({ defaults: { ease: 'power2.out' }, paused: true })
-        .to(target, { opacity: 0.5, scale: 1, duration: 1.2 })
+        .timeline({ defaults: { ease: 'power2.out', immediateRender: false }, paused: true })
+        .fromTo(target, { opacity: 0, scale: 0.92 }, { opacity: 0.5, scale: 1, duration: 1.2 })
 
-      ScrollTrigger.create({
+      const trigger = ScrollTrigger.create({
         trigger: rootRef.current,
         start: 'top 75%',
         toggleActions: 'play none none none',
@@ -39,7 +37,10 @@ export default function Chapter01Closing() {
         animation: timeline,
       })
 
-      return () => timeline.kill()
+      return () => {
+        timeline.kill()
+        trigger.kill()
+      }
     },
     { scope: rootRef, dependencies: [reduced] },
   )
